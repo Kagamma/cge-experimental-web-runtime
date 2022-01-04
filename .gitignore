@@ -1,0 +1,8 @@
+dist
+node_modules
+build
+lib
+public/*.wasm
+public/*.js
+*.o
+package-lock.json
