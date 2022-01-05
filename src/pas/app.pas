@@ -36,12 +36,12 @@ var
 
 begin
   // Prepare
-  glCreateBuffers(1, @VertexBuffer);
+  glGenBuffers(1, @VertexBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
   glBufferData(GL_ARRAY_BUFFER, SizeOf(Vertices), @Vertices[0], GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  glCreateBuffers(1, @IndexBuffer);
+  glGenBuffers(1, @IndexBuffer);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IndexBuffer);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, SizeOf(Indices), @Indices[0], GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
