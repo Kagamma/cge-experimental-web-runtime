@@ -887,15 +887,15 @@ export function OpenGLES(gl) {
     gl.vertexAttrib1f(index, x);
   }
 
-  function glVertexAttrib2f(index, x) {
+  function glVertexAttrib2f(index, x, y) {
     gl.vertexAttrib2f(index, x, y);
   }
 
-  function glVertexAttrib3f(index, x) {
+  function glVertexAttrib3f(index, x, y, z) {
     gl.vertexAttrib3f(index, x, y, z);
   }
 
-  function glVertexAttrib4f(index, x) {
+  function glVertexAttrib4f(index, x, y, z, w) {
     gl.vertexAttrib4f(index, x, y, z, w);
   }
 
