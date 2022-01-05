@@ -2,7 +2,7 @@
   "name": "wasm-test",
   "scripts": {
     "build-wasm": "fpc -Twasi -Pwasm32 -MObjFPC -Filib/wasm32-wasi -Fu. -FUlib/wasm32-wasi -FE. -opublic/app.wasm src/pas/app.pas",
-    "deploy": "npm run build-wasm && webpack",
+    "build": "npm run build-wasm && webpack",
     "start": "webpack serve --mode development --env development"
   },
   "devDependencies": {
