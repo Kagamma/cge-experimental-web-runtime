@@ -10,7 +10,7 @@ function main() {
 
   let gl = null;
   try {
-    gl = canvas.getContext('webgl');
+    gl = canvas.getContext('webgl2');
     gl.viewportWidth = canvas.width;
     gl.viewportHeight = canvas.height;
     console.log('WebGL context initialized.');

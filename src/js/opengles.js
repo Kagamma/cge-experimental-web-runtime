@@ -809,56 +809,56 @@ export function OpenGLES(gl) {
 
   function glUniform1fv(handle, count, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, count * 4);
-    gl.uniform1fv(uniformLocationHeap[handle], count, buf);
+    const buf = new Float32Array(moduleInstanceExports.memory.buffer, v, count);
+    gl.uniform1fv(uniformLocationHeap[handle], buf);
   }
 
   function glUniform2fv(handle, count, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, count * 8);
-    gl.uniform2fv(uniformLocationHeap[handle], count, buf);
+    const buf = new Float32Array(moduleInstanceExports.memory.buffer, v, count * 2);
+    gl.uniform2fv(uniformLocationHeap[handle], buf);
   }
 
   function glUniform3fv(handle, count, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, count * 12);
-    gl.uniform3fv(uniformLocationHeap[handle], count, buf);
+    const buf = new Float32Array(moduleInstanceExports.memory.buffer, v, count * 3);
+    gl.uniform3fv(uniformLocationHeap[handle], buf);
   }
 
   function glUniform4fv(handle, count, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, count * 16);
-    gl.uniform4fv(uniformLocationHeap[handle], count, buf);
+    const buf = new Float32Array(moduleInstanceExports.memory.buffer, v, count * 4);
+    gl.uniform4fv(uniformLocationHeap[handle], buf);
   }
 
   function glUniform1iv(handle, count, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, count * 4);
-    gl.uniform1iv(uniformLocationHeap[handle], count, buf);
+    const buf = new Int32Array(moduleInstanceExports.memory.buffer, v, count);
+    gl.uniform1iv(uniformLocationHeap[handle], buf);
   }
 
   function glUniform2iv(handle, count, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, count * 8);
-    gl.uniform2iv(uniformLocationHeap[handle], count, buf);
+    const buf = new Int32Array(moduleInstanceExports.memory.buffer, v, count * 2);
+    gl.uniform2iv(uniformLocationHeap[handle], buf);
   }
 
   function glUniform3iv(handle, count, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, count * 12);
-    gl.uniform3iv(uniformLocationHeap[handle], count, buf);
+    const buf = new Int32Array(moduleInstanceExports.memory.buffer, v, count * 3);
+    gl.uniform3iv(uniformLocationHeap[handle], buf);
   }
 
   function glUniform4iv(handle, count, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, count * 16);
-    gl.uniform4iv(uniformLocationHeap[handle], count, buf);
+    const buf = new Int32Array(moduleInstanceExports.memory.buffer, v, count * 4);
+    gl.uniform4iv(uniformLocationHeap[handle], buf);
   }
 
   function glUniformMatrix2fv(handle, count, transpose, v) {
     refreshMemory();
     for (let i = 0; i < count; i++) {
-      const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v + i * 8 * 8, 8 * 8);
+      const buf = new Float32Array(moduleInstanceExports.memory.buffer, v + i * 8 * 8, 2 * 2);
       gl.uniformMatrix2fv(uniformLocationHeap[handle], transpose, buf);
     }
   }
@@ -866,7 +866,7 @@ export function OpenGLES(gl) {
   function glUniformMatrix3fv(handle, count, transpose, v) {
     refreshMemory();
     for (let i = 0; i < count; i++) {
-      const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v + i * 12 * 12, 12 * 12);
+      const buf = new Float32Array(moduleInstanceExports.memory.buffer, v + i * 12 * 12, 3 * 3);
       gl.uniformMatrix3fv(uniformLocationHeap[handle], transpose, buf);
     }
   }
@@ -874,7 +874,7 @@ export function OpenGLES(gl) {
   function glUniformMatrix4fv(handle, count, transpose, v) {
     refreshMemory();
     for (let i = 0; i < count; i++) {
-      const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v + i * 16 * 16, 16 * 16);
+      const buf = new Float32Array(moduleInstanceExports.memory.buffer, v + i * 16 * 16, 4 * 4);
       gl.uniformMatrix4fv(uniformLocationHeap[handle], transpose, buf);
     }
   }
@@ -901,25 +901,25 @@ export function OpenGLES(gl) {
 
   function glVertexAttrib1fv(index, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, 4);
+    const buf = new Float32Array(moduleInstanceExports.memory.buffer, v, 1);
     gl.vertexAttrib1fv(index, buf);
   }
 
   function glVertexAttrib2fv(index, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, 8);
+    const buf = new Float32Array(moduleInstanceExports.memory.buffer, v, 2);
     gl.vertexAttrib2fv(index, buf);
   }
 
   function glVertexAttrib3fv(index, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, 12);
+    const buf = new Float32Array(moduleInstanceExports.memory.buffer, v, 3);
     gl.vertexAttrib3fv(index, buf);
   }
 
   function glVertexAttrib4fv(index, v) {
     refreshMemory();
-    const buf = new Uint8Array(moduleInstanceExports.memory.buffer, v, 16);
+    const buf = new Float32Array(moduleInstanceExports.memory.buffer, v, 4);
     gl.vertexAttrib4fv(index, buf);
   }
 
