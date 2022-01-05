@@ -337,11 +337,11 @@ export function OpenGLES(gl) {
     const info = gl.getActiveAttrib(objHeap[handleProg], indx);
     if (info) {
       const bytesArray = new TextEncoder().encode(info.name);
-      for (let i = 0; i < bytesArray.byteLength; i++) {
-        if (i === length) break;
+      const max = Math.min(bufsize, bytesArray.byteLength);
+      for (let i = 0; i < max; i++) {
         view.setUint8(name + i, bytesArray[i]);
       }
-      view.setUint32(length, Math.min(bufsize, bytesArray.byteLength), true);
+      view.setUint32(length, max, true);
       view.setUint32(size, info.size, true);
       view.setUint32(_type, info.type, true);
     } else {
@@ -354,11 +354,11 @@ export function OpenGLES(gl) {
     const info = gl.getActiveUniform(objHeap[handleProg], indx);
     if (info) {
       const bytesArray = new TextEncoder().encode(info.name);
-      for (let i = 0; i < bytesArray.byteLength; i++) {
-        if (i === length) break;
+      const max = Math.min(bufsize, bytesArray.byteLength);
+      for (let i = 0; i < max; i++) {
         view.setUint8(name + i, bytesArray[i]);
       }
-      view.setUint32(length, Math.min(bufsize, bytesArray.byteLength), true);
+      view.setUint32(length, max, true);
       view.setUint32(size, info.size, true);
       view.setUint32(_type, info.type, true);
     } else {
