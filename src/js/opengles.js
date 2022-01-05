@@ -1006,6 +1006,8 @@ export function OpenGLES(gl) {
     glClearStencil: glClearStencil,
     glColorMask: glColorMask,
     glCompileShader: glCompileShader,
+    glCompressedTexImage2D: glCompressedTexImage2D,
+    glCompressedTexSubImage2D: glCompressedTexSubImage2D,
     glCopyTexImage2D: glCopyTexImage2D,
     glCopyTexSubImage2D: glCopyTexSubImage2D,
     glCreateProgram: glCreateProgram,
