@@ -965,11 +965,11 @@ export function OpenGLES(gl) {
 
   function glTransformFeedbackVaryings(handle, count, varyings, mode) {
     refreshMemory();
-    const strings = [];
+    const strings = new Array(count);
     for (let i = 0; i < count; i++) {
       const sptr = view.getUint32(varyings + i * 4, true);
       const s = pcharToJSString(view, moduleInstanceExports.memory.buffer, sptr);
-      strings.push(s);
+      strings[i] = s;
     }
     gl.transformFeedbackVaryings(objHeap[handle], strings, mode);
   }
