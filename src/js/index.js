@@ -19,7 +19,7 @@ function main() {
   document.body.appendChild(main);
 
   const canvas = document.createElement('canvas');
-  canvas.width = main.offsetHeight / 3 * 4;
+  canvas.width = main.offsetHeight;
   canvas.height = main.offsetHeight;
   canvas.id = 'webgl-canvas';
   main.appendChild(canvas);
