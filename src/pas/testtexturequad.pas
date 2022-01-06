@@ -130,7 +130,7 @@ end;
 procedure TTestTextureQuad.Render(const DeltaTime: Single);
 begin
   inherited;
-  glViewport(0, 0, 640, 480);
+  glViewport(0, 0, FViewportWidth, FViewportHeight);
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT);
 

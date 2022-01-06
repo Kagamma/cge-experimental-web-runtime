@@ -5,7 +5,6 @@ uses
   OpenGLES, Window, TestTriangle, TestFilesystem, TestTextureQuad;
 
 var
-  Win: TWindow = nil;
   Ticks: QWord;
 
 procedure InitTestTriangle;

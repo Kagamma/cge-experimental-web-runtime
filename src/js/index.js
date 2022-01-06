@@ -3,7 +3,7 @@ import { OpenGLES } from './opengles';
 
 function main() {
   const menu = document.createElement('div');
-  menu.style.width = '100%';
+  menu.style.width = '100vw';
   menu.style.display = 'flex';
   menu.style.flexDirection = 'row';
   menu.style.justifyContent = 'center';
@@ -11,15 +11,16 @@ function main() {
   document.body.appendChild(menu);
 
   const main = document.createElement('div');
-  main.style.width = '100%';
+  main.style.width = '100vw';
+  main.style.height = 'calc(100vh - 64px)';
   main.style.display = 'flex';
   main.style.flexDirection = 'row';
   main.style.justifyContent = 'center';
   document.body.appendChild(main);
 
   const canvas = document.createElement('canvas');
-  canvas.width = '640';
-  canvas.height = '480';
+  canvas.width = main.offsetHeight / 3 * 4;
+  canvas.height = main.offsetHeight;
   canvas.id = 'webgl-canvas';
   main.appendChild(canvas);
 
@@ -51,6 +52,7 @@ function main() {
     buttonTriangleTest.style.margin = '0 4px 0 4px';
     buttonTriangleTest.onclick = () => {
       result.instance.exports.InitTestTriangle();
+      result.instance.exports.EventResize(canvas.offsetWidth, canvas.offsetHeight);
       const loop = () => {
         result.instance.exports.Run();
         window.requestAnimationFrame(loop);
@@ -64,6 +66,7 @@ function main() {
     buttonTextureQuadTest.style.margin = '0 4px 0 4px';
     buttonTextureQuadTest.onclick = () => {
       result.instance.exports.InitTestTextureQuad();
+      result.instance.exports.EventResize(canvas.offsetWidth, canvas.offsetHeight);
       const loop = () => {
         result.instance.exports.Run();
         window.requestAnimationFrame(loop);
