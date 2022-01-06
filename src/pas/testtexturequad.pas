@@ -1,4 +1,4 @@
-unit TestTriangle;
+unit TestTextureQuad;
 
 {$macro on}
 {$define nl:=+ LineEnding +}
@@ -9,12 +9,13 @@ uses
   Window, OpenGLES;
 
 type
-  TTestTriangle = class(TWindow)
+  TTestTextureQuad = class(TWindow)
   private
-    FVertexBuffer: GLuint;
+    FTexture: GLuint;
+    FVertexBuffer, FTexCoordBuffer: GLuint;
     FVertShader, FFragShader, FProg: GLuint;
-    FVertexLoc: GLint;
-    FAngleUniformLoc: GLint;
+    FVertexLoc, FTexCoordLoc: GLint;
+    FAngleUniformLoc, FTextureUniformLoc: GLint;
     FAngle: Single;
   public
     constructor Create;
@@ -25,35 +26,66 @@ type
 
 implementation
 
+{$I ./image.inc}
+
 var
   VertShaderSource: PChar =
 'attribute vec3 vertex;'nl
+'attribute vec2 texcoord;'nl
 'uniform float angle;'nl
+'varying lowp vec2 fragTexCoord;'nl
 'void main(void) {'nl
 '  vec3 v = vec3('nl
 '    vertex.x * cos(angle) - vertex.y * sin(angle),'nl
 '    vertex.x * sin(angle) + vertex.y * cos(angle), 0.0'nl
 '  );'nl
 '  gl_Position = vec4(v, 1.0);'nl
+'  fragTexCoord = texcoord;'nl
 '}';
   FragShaderSource: PChar =
+'uniform sampler2D tex;'nl
+'varying lowp vec2 fragTexCoord;'nl
 'void main(void) {'nl
-'  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);'nl
+'  gl_FragColor = texture2D(tex, fragTexCoord);'nl
 '}';
-  Vertices: array[0..8] of Single = (
-    0.0,  0.5, 0.0,
+  Vertices: array[0..17] of Single = (
     -0.5, -0.5, 0.0,
-    0.5, -0.5, 0.0
+     0.5, -0.5, 0.0,
+     0.5,  0.5, 0.0,
+    -0.5, -0.5, 0.0,
+     0.5,  0.5, 0.0,
+    -0.5,  0.5, 0.0
+  );
+  TexCoords: array[0..11] of Single = (
+    0, 0,
+    1, 0,
+    1, 1,
+    0, 0,
+    1, 1,
+    0, 1
   );
 
-constructor TTestTriangle.Create;
+constructor TTestTextureQuad.Create;
 var
   Len: GLint;
 begin
   inherited;
+  glGenTextures(1, @FTexture);
+  glBindTexture(GL_TEXTURE_2D, FTexture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ImageWidth, ImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, @ImagePixels[0]);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
   glGenBuffers(1, @FVertexBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, FVertexBuffer);
   glBufferData(GL_ARRAY_BUFFER, SizeOf(Vertices), @Vertices[0], GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  glGenBuffers(1, @FTexCoordBuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, FTexCoordBuffer);
+  glBufferData(GL_ARRAY_BUFFER, SizeOf(TexCoords), @TexCoords[0], GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   FVertShader := glCreateShader(GL_VERTEX_SHADER);
@@ -72,26 +104,30 @@ begin
   glLinkProgram(FProg);
 
   FVertexLoc := glGetAttribLocation(FProg, 'vertex');
+  FTexCoordLoc := glGetAttribLocation(FProg, 'texcoord');
   FAngleUniformLoc := glGetUniformLocation(FProg, 'angle');
+  FTextureUniformLoc := glGetUniformLocation(FProg, 'tex');
   FAngle := 0;
 end;
 
-destructor TTestTriangle.Destroy;
+destructor TTestTextureQuad.Destroy;
 begin
   glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT);
   glDeleteProgram(FProg);
   glDeleteShader(FVertShader);
   glDeleteShader(FFragShader);
   glDeleteBuffers(1, @FVertexBuffer);
+  glDeleteBuffers(1, @FTexCoordBuffer);
+  glDeleteTextures(1, @FTexture);
   inherited;
 end;
 
-procedure TTestTriangle.Update;
+procedure TTestTextureQuad.Update;
 begin
   inherited;
 end;
 
-procedure TTestTriangle.Render(const DeltaTime: Single);
+procedure TTestTextureQuad.Render(const DeltaTime: Single);
 begin
   inherited;
   glViewport(0, 0, 640, 480);
@@ -100,10 +136,19 @@ begin
 
   glUseProgram(FProg);
   glUniform1f(FAngleUniformLoc, FAngle);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, FTexture);
+
   glBindBuffer(GL_ARRAY_BUFFER, FVertexBuffer);
   glVertexAttribPointer(FVertexLoc, 3, GL_FLOAT, GL_FALSE, 0, nil);
   glEnableVertexAttribArray(FVertexLoc);
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+
+  glBindBuffer(GL_ARRAY_BUFFER, FTexCoordBuffer);
+  glVertexAttribPointer(FTexCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, nil);
+  glEnableVertexAttribArray(FTexCoordLoc);
+
+  glDrawArrays(GL_TRIANGLES, 0, 6);
   FAngle := FAngle + 1.68 * DeltaTime;
 end;
 

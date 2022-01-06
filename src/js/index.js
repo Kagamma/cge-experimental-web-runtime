@@ -47,7 +47,7 @@ function main() {
     result.instance.exports._start();
 
     const buttonTriangleTest = document.createElement('button');
-    buttonTriangleTest.innerHTML = 'Render rotate triangle';
+    buttonTriangleTest.innerHTML = 'Rotate triangle';
     buttonTriangleTest.style.margin = '0 4px 0 4px';
     buttonTriangleTest.onclick = () => {
       result.instance.exports.InitTestTriangle();
@@ -58,6 +58,19 @@ function main() {
       window.requestAnimationFrame(loop);
     };
     menu.appendChild(buttonTriangleTest);
+
+    const buttonTextureQuadTest = document.createElement('button');
+    buttonTextureQuadTest.innerHTML = 'Texture quad';
+    buttonTextureQuadTest.style.margin = '0 4px 0 4px';
+    buttonTextureQuadTest.onclick = () => {
+      result.instance.exports.InitTestTextureQuad();
+      const loop = () => {
+        result.instance.exports.Run();
+        window.requestAnimationFrame(loop);
+      };
+      window.requestAnimationFrame(loop);
+    };
+    menu.appendChild(buttonTextureQuadTest);
 
     const buttonFilesystemTest = document.createElement('button');
     buttonFilesystemTest.innerHTML = 'Filesystem';

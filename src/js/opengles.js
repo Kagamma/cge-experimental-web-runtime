@@ -730,7 +730,7 @@ export function OpenGLES(gl) {
   function glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels) {
     refreshMemory();
     let size = 4;
-    switch (internalFormat) {
+    switch (internalformat) {
       case gl.RGBA:
         size = 4; break;
       case gl.RGB:
@@ -750,7 +750,7 @@ export function OpenGLES(gl) {
   function glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels) {
     refreshMemory();
     let size = 4;
-    switch (internalFormat) {
+    switch (format) {
       case gl.RGBA:
         size = 4; break;
       case gl.RGB:
