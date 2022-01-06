@@ -7,7 +7,8 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Run(const DeltaTime: Single); virtual;
+    procedure Update; virtual;
+    procedure Render(const DeltaTime: Single); virtual;
   end;
 
 implementation
@@ -22,7 +23,12 @@ begin
   inherited;
 end;
 
-procedure TWindow.Run(const DeltaTime: Single);
+procedure TWindow.Update;
+begin
+  
+end;
+
+procedure TWindow.Render(const DeltaTime: Single);
 begin
   
 end;

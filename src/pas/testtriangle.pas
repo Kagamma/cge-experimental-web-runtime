@@ -20,7 +20,8 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Run(const DeltaTime: Single); override;
+    procedure Update; override;
+    procedure Render(const DeltaTime: Single); override;
   end;
 
 implementation
@@ -86,7 +87,12 @@ begin
   inherited;
 end;
 
-procedure TTestTriangle.Run(const DeltaTime: Single);
+procedure TTestTriangle.Update;
+begin
+  inherited;
+end;
+
+procedure TTestTriangle.Render(const DeltaTime: Single);
 begin
   inherited;
   glViewport(0, 0, 640, 480);

@@ -20,8 +20,10 @@ var
   DeltaTime: Single;
 begin
   DeltaTime := (GetTickCount64 - Ticks) / 1000;
-  Win.Run(DeltaTime);
   Ticks := GetTickCount64;
+
+  Win.Update;
+  Win.Render(DeltaTime);
 end;
 
 exports
