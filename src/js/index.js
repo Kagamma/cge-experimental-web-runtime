@@ -7,7 +7,7 @@ function main() {
   menu.style.display = 'flex';
   menu.style.flexDirection = 'row';
   menu.style.justifyContent = 'center';
-  menu.style.padding = '8px';
+  menu.style.margin = '8px';
   document.body.appendChild(menu);
 
   const main = document.createElement('div');
@@ -48,6 +48,7 @@ function main() {
 
     const buttonTriangleTest = document.createElement('button');
     buttonTriangleTest.innerHTML = 'Render rotate triangle';
+    buttonTriangleTest.style.margin = '0 4px 0 4px';
     buttonTriangleTest.onclick = () => {
       result.instance.exports.InitTestTriangle();
       const loop = () => {
@@ -57,6 +58,19 @@ function main() {
       window.requestAnimationFrame(loop);
     };
     menu.appendChild(buttonTriangleTest);
+
+    const buttonFilesystemTest = document.createElement('button');
+    buttonFilesystemTest.innerHTML = 'Filesystem';
+    buttonFilesystemTest.style.margin = '0 4px 0 4px';
+    buttonFilesystemTest.onclick = () => {
+      result.instance.exports.InitTestFilesystem();
+      const loop = () => {
+        result.instance.exports.Run();
+        window.requestAnimationFrame(loop);
+      };
+      window.requestAnimationFrame(loop);
+    };
+    menu.appendChild(buttonFilesystemTest);
   })();
 }
 

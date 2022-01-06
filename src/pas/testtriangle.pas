@@ -80,6 +80,7 @@ end;
 
 destructor TTestTriangle.Destroy;
 begin
+  glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT);
   glDeleteProgram(FProg);
   glDeleteShader(FVertShader);
   glDeleteShader(FFragShader);

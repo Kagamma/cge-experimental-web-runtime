@@ -2,7 +2,7 @@ program App;
 
 uses
   SysUtils,
-  OpenGLES, Window, TestTriangle;
+  OpenGLES, Window, TestTriangle, TestFilesystem;
 
 var
   Win: TWindow = nil;
@@ -13,6 +13,13 @@ begin
   if Win <> nil then
     FreeAndNil(Win);
   Win := TTestTriangle.Create;
+end;
+
+procedure InitTestFilesystem;
+begin
+  if Win <> nil then
+    FreeAndNil(Win);
+  Win := TTestFilesystem.Create;
 end;
 
 procedure Run;
@@ -28,6 +35,7 @@ end;
 
 exports
   InitTestTriangle,
+  InitTestFilesystem,
   Run;
 
 begin
