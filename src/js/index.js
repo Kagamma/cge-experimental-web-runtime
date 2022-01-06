@@ -3,15 +3,25 @@ import { OpenGLES } from './opengles';
 
 function main() {
   const menu = document.createElement('div');
+  menu.style.width = '100%';
   menu.style.display = 'flex';
   menu.style.flexDirection = 'row';
+  menu.style.justifyContent = 'center';
+  menu.style.padding = '8px';
   document.body.appendChild(menu);
+
+  const main = document.createElement('div');
+  main.style.width = '100%';
+  main.style.display = 'flex';
+  main.style.flexDirection = 'row';
+  main.style.justifyContent = 'center';
+  document.body.appendChild(main);
 
   const canvas = document.createElement('canvas');
   canvas.width = '640';
   canvas.height = '480';
   canvas.id = 'webgl-canvas';
-  document.body.appendChild(canvas);
+  main.appendChild(canvas);
 
   let gl = null;
   try {
