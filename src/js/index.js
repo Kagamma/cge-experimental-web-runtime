@@ -2,6 +2,11 @@ import { WASI } from './wasi';
 import { OpenGLES } from './opengles';
 
 function main() {
+  const menu = document.createElement('div');
+  menu.style.display = 'flex';
+  menu.style.flexDirection = 'row';
+  document.body.appendChild(menu);
+
   const canvas = document.createElement('canvas');
   canvas.width = '640';
   canvas.height = '480';
@@ -30,6 +35,18 @@ function main() {
     wasi.setModuleInstance(result.instance);
     opengles.setModuleInstance(result.instance);
     result.instance.exports._start();
+
+    const buttonTriangleTest = document.createElement('button');
+    buttonTriangleTest.innerHTML = 'Render rotate triangle';
+    buttonTriangleTest.onclick = () => {
+      result.instance.exports.InitTestTriangle();
+      const loop = () => {
+        result.instance.exports.Run();
+        window.requestAnimationFrame(loop);
+      };
+      window.requestAnimationFrame(loop);
+    };
+    menu.appendChild(buttonTriangleTest);
   })();
 }
 

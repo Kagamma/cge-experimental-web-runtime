@@ -203,14 +203,14 @@ export function OpenGLES(gl) {
   function glDeleteBuffers(n, buffers) {
     refreshMemory();
     for (let i = 0; i < n; i++) {
-      gl.deleteBuffer(releaseHandle(view.getUInt32(buffers + i * 4)));
+      gl.deleteBuffer(releaseHandle(view.getUint32(buffers + i * 4)));
     }
   }
 
   function glDeleteFramebuffers(n, framebuffers) {
     refreshMemory();
     for (let i = 0; i < n; i++) {
-      gl.deleteFramebuffer(releaseHandle(view.getUInt32(framebuffers + i * 4)));
+      gl.deleteFramebuffer(releaseHandle(view.getUint32(framebuffers + i * 4)));
     }
   }
 
@@ -221,7 +221,7 @@ export function OpenGLES(gl) {
   function glDeleteRenderbuffers(n, renderbuffers) {
     refreshMemory();
     for (let i = 0; i < n; i++) {
-      gl.deleteRenderbuffer(releaseHandle(view.getUInt32(renderbuffers + i * 4)));
+      gl.deleteRenderbuffer(releaseHandle(view.getUint32(renderbuffers + i * 4)));
     }
   }
 
@@ -232,7 +232,7 @@ export function OpenGLES(gl) {
   function glDeleteTextures(n, textures) {
     refreshMemory();
     for (let i = 0; i < n; i++) {
-      gl.deleteRenderbuffer(releaseHandle(view.getUInt32(textures + i * 4)));
+      gl.deleteRenderbuffer(releaseHandle(view.getUint32(textures + i * 4)));
     }
   }
 
@@ -943,7 +943,7 @@ export function OpenGLES(gl) {
   function glDeleteVertexArrays(n, va) {
     refreshMemory();
     for (let i = 0; i < n; i++) {
-      gl.deleteRenderbuffer(releaseHandle(view.getUInt32(va + i * 4)));
+      gl.deleteRenderbuffer(releaseHandle(view.getUint32(va + i * 4)));
     }
   }
 
