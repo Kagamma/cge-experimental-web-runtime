@@ -52,7 +52,6 @@ procedure EventResize(Width, Height: Integer);
 begin
   if Win <> nil then
     Win.EventResize(Width, Height);
-  Writeln(Width, ' ', Height);
 end;
 
 exports
