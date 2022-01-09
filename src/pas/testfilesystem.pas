@@ -53,12 +53,21 @@ begin
   S := '   ';
   FileRead(F, S[1], 2);
   Writeln('- Result: ', S);
+
   Writeln('Seek to 3');
   FileSeek(F, 3, fsFromBeginning);
   Writeln('Read 3 bytes from "test.txt"');
   S := '   ';
   FileRead(F, S[1], 3);
   Writeln('- Result: ', S);
+
+  Writeln('Seek to 4');
+  FileSeek(F, 4, fsFromBeginning);
+  Writeln('Read 6 bytes from "test.txt"');
+  S := '      ';
+  Writeln('- Actual bytes read: ', FileRead(F, S[1], 6), ' bytes');
+  Writeln('- Result: ', S);
+
   Writeln('Close file "test.txt"');
   FileClose(F);
 
