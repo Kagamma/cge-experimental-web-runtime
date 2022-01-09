@@ -349,6 +349,7 @@ export const WASI = function() {
           break;
         }
       };
+      stats.offset += BigInt(bytesRead);
     }
     view.setUint32(nread, bytesRead, true);
     return WASI_ESUCCESS;
@@ -376,6 +377,16 @@ export const WASI = function() {
       }
       view.setBigUint64(result, stats.offset, true);
     }
+    return WASI_ESUCCESS;
+  }
+
+  function fd_tell(fd, result) {
+    refreshMemory();
+    const stats = handles[fd];
+    if (!stats) {
+      return WASI_EINVAL;
+    }
+    view.setBigUint64(result, stats.offset, true);
     return WASI_ESUCCESS;
   }
 
@@ -467,7 +478,7 @@ export const WASI = function() {
     fd_seek: fd_seek,
     fd_read: fd_read,
     fd_write: fd_write,
-    fd_tell: fnfixme('fd_tell'),
+    fd_tell: fd_tell,
     fd_filestat_get: fd_filestat_get,
     path_readlink: fnfixme('path_readlink'),
     path_open: path_open,

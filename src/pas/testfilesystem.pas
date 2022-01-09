@@ -17,8 +17,9 @@ implementation
 constructor TTestFilesystem.Create;
 var
   F: THandle;
-  FF: File of Byte;
+  FF: File of Char;
   S: String = 'ABC123';
+  C: Char;
 begin
   inherited;
   Writeln('TODO: Filesystem');
@@ -36,7 +37,7 @@ begin
   else
     Writeln('- Not found!');
 
-  Writeln('Write "ABC123" to "test.txt"');
+  Writeln('Write ', S ,' to "test.txt"');
   FileWrite(F, S[1], 6);
   Writeln('Close file "test.txt"');
   FileClose(F);
@@ -45,6 +46,15 @@ begin
   Assign(FF, 'test.txt');
   Reset(FF);
   Writeln('- ', FileSize(FF), ' bytes');
+  Writeln('Read everthing from "test.txt"');
+  S := '';
+  while not EOF(FF) do
+  begin
+    Read(FF, C);
+    S := S + C;
+  end;
+  Writeln('- ', S);
+  Writeln('Close file "test.txt"');
   Close(FF);
 
   Writeln('Open file "test.txt"');
