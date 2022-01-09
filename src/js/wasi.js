@@ -281,8 +281,9 @@ export const WASI = function() {
     if (!stats) {
       return WASI_EINVAL;
     }
-    // FIXME: Pass file attributes to result
+    // Pass file attributes to result
     const rstats = fs.fstatSync(stats.real);
+    view.setUint8(result + 16, rstats.filetype, true);
     view.setBigUint64(result + 32, BigInt(rstats.size), true);
     return WASI_ESUCCESS;
   }
@@ -407,8 +408,18 @@ export const WASI = function() {
     refreshMemory();
     const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, path);
     const stats = checkExists(jspath);
-    if (stats && stats.isFile()) {
-      // FIXME: Pass file attributes to result
+    if (stats && (stats.isFile() || stats.isDirectory())) {
+      let filetype = WASI_FILETYPE_UNKNOWN;
+      switch (true) {
+        case stats.isFile():
+          filetype = WASI_FILETYPE_REGULAR_FILE;
+          break;
+        case stats.isDirectory():
+          filetype = WASI_FILETYPE_DIRECTORY;
+          break;
+      }
+      view.setUint8(result + 16, filetype, true);
+      view.setBigUint64(result + 32, BigInt(stats.size), true);
       return WASI_ESUCCESS;
     }
     return WASI_EINVAL;
