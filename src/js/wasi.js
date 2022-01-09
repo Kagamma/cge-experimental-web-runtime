@@ -274,6 +274,19 @@ export const WASI = function() {
     return WASI_ESUCCESS;
   }
 
+  function fd_filestat_get(fd, result) {
+    if (fd !== availFD) return WASI_EINVAL;
+    refreshMemory();
+    const stats = handles[fd];
+    if (!stats) {
+      return WASI_EINVAL;
+    }
+    // FIXME: Pass file attributes to result
+    const rstats = fs.fstatSync(stats.real);
+    view.setBigUint64(result + 32, BigInt(rstats.size), true);
+    return WASI_ESUCCESS;
+  }
+
   function fd_write(fd, iovs, iovsLen, nwritten) {
     refreshMemory();
     let bytesWritten = 0;
@@ -357,8 +370,8 @@ export const WASI = function() {
           stats.offset = stats.offset ? stats.offset : BigInt(0) + BigInt(offset);
           break;
         case WASI_WHENCE_END:
-          const { size } = fs.fstatSync(stats.real);
-          stats.offset = BigInt(size) + BigInt(offset);
+          const rstats = fs.fstatSync(stats.real);
+          stats.offset = BigInt(rstats.size) + BigInt(offset);
           break;
       }
       view.setBigUint64(result, stats.offset, true);
@@ -455,7 +468,7 @@ export const WASI = function() {
     fd_read: fd_read,
     fd_write: fd_write,
     fd_tell: fnfixme('fd_tell'),
-    fd_filestat_get: fnfixme('fd_filestat_get'),
+    fd_filestat_get: fd_filestat_get,
     path_readlink: fnfixme('path_readlink'),
     path_open: path_open,
     path_filestat_get: path_filestat_get,
