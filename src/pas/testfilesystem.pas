@@ -21,16 +21,13 @@ var
   S: String;
   C: Char;
   DirectoryName: String = 'data';
-  FileName: String = 'test.txt';
+  FileName: String = 'data/test.txt';
 begin
   inherited;
   Writeln('TODO: Filesystem');
 
-  Writeln('Looking for directory "', DirectoryName, '"...');
-  if DirectoryExists(DirectoryName) then
-    Writeln('- Found!')
-  else
-    Writeln('- Not found!');
+  Writeln('Create directory "', DirectoryName, '"');
+  CreateDir(DirectoryName);
 
   Writeln('Looking for ', FileName, '...');
   if FileExists(FileName) then
@@ -38,7 +35,7 @@ begin
   else
     Writeln('- Not found!');
   Writeln('Create a new ', FileName);
-  F := FileCreate('test.txt');
+  F := FileCreate(FileName);
 
   Writeln('Looking for ', FileName, '...');
   if FileExists(FileName) then
@@ -96,10 +93,10 @@ begin
   FileClose(F);
 
   Writeln('Delete file ', FileName);
-  DeleteFile('test.txt');
+  DeleteFile(FileName);
 
   Writeln('Looking for ', FileName, '...');
-  if FileExists('test.txt') then
+  if FileExists(FileName) then
     Writeln('- Found!')
   else
     Writeln('- Not found!');

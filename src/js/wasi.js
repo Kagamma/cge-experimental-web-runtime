@@ -283,7 +283,7 @@ export const WASI = function() {
     }
     // Pass file attributes to result
     const rstats = fs.fstatSync(stats.real);
-    view.setUint8(result + 16, rstats.filetype, true);
+    view.setUint8(result + 16, rstats.filetype);
     view.setBigUint64(result + 32, BigInt(rstats.size), true);
     return WASI_ESUCCESS;
   }
@@ -418,7 +418,7 @@ export const WASI = function() {
           filetype = WASI_FILETYPE_DIRECTORY;
           break;
       }
-      view.setUint8(result + 16, filetype, true);
+      view.setUint8(result + 16, filetype);
       view.setBigUint64(result + 32, BigInt(stats.size), true);
       return WASI_ESUCCESS;
     }
@@ -455,6 +455,22 @@ export const WASI = function() {
       return WASI_ESUCCESS;
     }
     return WASI_EINVAL;
+  }
+
+  function path_create_directory(fd, pathStr, pathLen) {
+    if (fd !== availFD) return WASI_EINVAL;
+    refreshMemory();
+    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathStr, pathLen);
+    fs.mkdirSync(jspath);
+    return WASI_ESUCCESS;
+  }
+
+  function path_remove_directory(fd) {
+    if (fd !== availFD) return WASI_EINVAL;
+    refreshMemory();
+    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathStr, pathLen);
+    fs.rmdirSync(jspath);
+    return WASI_ESUCCESS;
   }
 
   function path_unlink_file(fd, pathPtr, pathLen) {
@@ -496,6 +512,8 @@ export const WASI = function() {
     fd_filestat_get: fd_filestat_get,
     path_readlink: fnfixme('path_readlink'),
     path_open: path_open,
+    path_create_directory: path_create_directory,
+    path_remove_directory: path_remove_directory,
     path_filestat_get: path_filestat_get,
     path_unlink_file: path_unlink_file,
     proc_exit: proc_exit,
