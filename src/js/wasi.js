@@ -160,6 +160,9 @@ const WASI_RIGHT_PATH_UNLINK_FILE = BigInt(0x0000000004000000);
 const WASI_RIGHT_POLL_FD_READWRITE = BigInt(0x0000000008000000);
 const WASI_RIGHT_SOCK_SHUTDOWN = BigInt(0x0000000010000000);
 const WASI_PREOPENTYPE_DIR = 0;
+const WASI_WHENCE_SET = 0;
+const WASI_WHENCE_CUR = 1;
+const WASI_WHENCE_END = 2;
 const WASI_STDIN = 0;
 const WASI_STDOUT = 1;
 const WASI_STDERR = 2;
@@ -168,7 +171,36 @@ export const WASI = function() {
   let view = null;
   let moduleInstanceExports = null;
   let preOpenDirs = false;
-  let fileDescriptor = -1;
+  let availFD = -1;
+  // Store opened file handles
+  const handles = new Array(65536);
+
+  function getEmptyHandle() {
+    for (let i = 3; i < handles.length; i++){
+      if (handles[i] === undefined) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
+  function createHandle(obj) {
+    const handle = getEmptyHandle();
+    if (handle === 0) {
+      return handle;
+    }
+    handles[handle] = obj;
+    return handle;
+  }
+
+  function releaseHandle(handle) {
+    if (handle === 0) {
+      return null;
+    }
+    const obj = handles[handle];
+    handles[handle] = undefined;
+    return obj;
+  }
 
   // Private Helpers
   function refreshMemory() {
@@ -227,7 +259,7 @@ export const WASI = function() {
     // Simulate preopen dir
     if (!preOpenDirs) {
       preOpenDirs = true;
-      fileDescriptor = fd;
+      availFD = fd;
       view.setUint8(result, WASI_PREOPENTYPE_DIR); // tag
       view.setUint32(result + 4, 1, true); // Name len, '/'
       return WASI_ESUCCESS;
@@ -236,8 +268,8 @@ export const WASI = function() {
   }
 
   function fd_prestat_dir_name(fd, pathPtr, pathLen) {
+    if (fd !== availFD) return WASI_EINVAL;
     refreshMemory();
-    if (fd !== fileDescriptor) return WASI_EINVAL;
     view.setUint8(pathPtr, '/'.charCodeAt(0)); // Name, '/'
     return WASI_ESUCCESS;
   }
@@ -245,34 +277,154 @@ export const WASI = function() {
   function fd_write(fd, iovs, iovsLen, nwritten) {
     refreshMemory();
     let bytesWritten = 0;
-    let s = '';
-    for (let i = 0; i < iovsLen; i++) {
-      const ptr = iovs + i * 8;
-      const buf = view.getUint32(ptr, true);
-      const bufLen = view.getUint32(ptr + 4, true);
-      bytesWritten += bufLen;
-      s += pcharToJSString(view, moduleInstanceExports.memory.buffer, buf, bufLen);
-    };
-    if (fd === WASI_STDOUT) {
-      console.log(s);
-    } else
-    if (fd === WASI_STDERR) {
-      console.error(s);
+    if (fd < 3) {
+      // Write to console
+      let s = '';
+      for (let i = 0; i < iovsLen; i++) {
+        const ptr = iovs + i * 8;
+        const buf = view.getUint32(ptr, true);
+        const bufLen = view.getUint32(ptr + 4, true);
+        bytesWritten += bufLen;
+        s += pcharToJSString(view, moduleInstanceExports.memory.buffer, buf, bufLen);
+      };
+      if (fd === WASI_STDOUT) {
+        console.log(s);
+      } else
+      if (fd === WASI_STDERR) {
+        console.error(s);
+      }
+    } else {
+      // Write to file
+      const stats = handles[fd];
+      if (!stats) {
+        return WASI_EINVAL;
+      }
+      for (let i = 0; i < iovsLen; i++) {
+        const ptr = iovs + i * 8;
+        const buf = view.getUint32(ptr, true);
+        const bufLen = view.getUint32(ptr + 4, true);
+        bytesWritten += bufLen;
+        const data = new Uint8Array(moduleInstanceExports.memory.buffer, buf, bufLen);
+        fs.writeSync(stats.real, data);
+      };
     }
     view.setUint32(nwritten, bytesWritten, true);
     return WASI_ESUCCESS;
   }
 
-  function path_filestat_get(fd, flags, path, result) {
+  function fd_read(fd, iovs, iovsLen, nread) {
     refreshMemory();
-    if (fd !== fileDescriptor) return WASI_EINVAL;
-    const s = pcharToJSString(view, moduleInstanceExports.memory.buffer, path);
-    const stats = checkExists(s);
+    let bytesRead = 0;
+    if (fd >= 3) {
+      // Read from file
+      const stats = handles[fd];
+      if (!stats) {
+        return WASI_EINVAL;
+      }
+      let offset = BigInt(stats.offset);
+      for (let i = 0; i < iovsLen; i++) {
+        const ptr = iovs + i * 8;
+        const buf = view.getUint32(ptr, true);
+        const bufLen = view.getUint32(ptr + 4, true);
+        const data = new Uint8Array(moduleInstanceExports.memory.buffer, buf, bufLen);
+        data._isBuffer = true; // Workaround "not a buffer" issue
+        const rr = fs.readSync(stats.real, data, 0, bufLen, Number(offset));
+        bytesRead += rr;
+        offset += BigInt(rr);
+        // Break when EOF
+        if (rr < bufLen) {
+          break;
+        }
+      };
+    }
+    view.setUint32(nread, bytesRead, true);
+    return WASI_ESUCCESS;
+  }
+
+  function fd_seek(fd, offset, whence, result) {
+    refreshMemory();
+    if (fd >= 3) {
+      // Seek from file
+      const stats = handles[fd];
+      if (!stats) {
+        return WASI_EINVAL;
+      }
+      switch (whence) {
+        case WASI_WHENCE_SET:
+          stats.offset = BigInt(offset);
+          break;
+        case WASI_WHENCE_CUR:
+          stats.offset = stats.offset ? stats.offset : BigInt(0) + BigInt(offset);
+          break;
+        case WASI_WHENCE_END:
+          const { size } = fs.fstatSync(stats.real);
+          stats.offset = BigInt(size) + BigInt(offset);
+          break;
+      }
+      view.setBigUint64(result, stats.offset, true);
+    }
+    return WASI_ESUCCESS;
+  }
+
+  function fd_close(fd) {
+    const stats = releaseHandle(fd);
+    if (!stats) {
+      return WASI_EINVAL;
+    }
+    fs.closeSync(stats.real);
+    return WASI_ESUCCESS;
+  }
+
+  function path_filestat_get(fd, flags, path, result) {
+    if (fd !== availFD) return WASI_EINVAL;
+    refreshMemory();
+    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, path);
+    const stats = checkExists(jspath);
     if (stats && stats.isFile()) {
       // FIXME: Pass file attributes to result
       return WASI_ESUCCESS;
     }
     return WASI_EINVAL;
+  }
+
+  function path_open(fd, dirflags, path, oflags, fs_rights_base, fs_rights_inheriting, fdflags, empty, resultfs) {
+    if (fd !== availFD) return WASI_EINVAL;
+    refreshMemory();
+    fs_rights_base = BigInt(fs_rights_base);
+    const read = (fs_rights_base & (WASI_RIGHT_FD_READ | WASI_RIGHT_FD_READDIR)) !== BigInt(0);
+    const write = (fs_rights_base & (WASI_RIGHT_FD_DATASYNC | WASI_RIGHT_FD_WRITE | WASI_RIGHT_FD_ALLOCATE | WASI_RIGHT_FD_FILESTAT_SET_SIZE)) !== BigInt(0);
+    let flags = 'r';
+    if (read && write) {
+      flags = 'a';
+    } else if (write) {
+      flags = 'w';
+    }
+    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, path);
+    const stats = checkExists(jspath);
+    if (!stats || stats.isFile()) {
+      // Create new file if it's not exists
+      if (!stats) fs.appendFileSync(jspath, '');
+      // Prepare handle
+      const handle = createHandle({
+        real: fs.openSync(jspath, flags),
+        path: jspath,
+        read,
+        write,
+        offset: BigInt(0),
+      });
+      // Write handle to result
+      view.setUint32(resultfs, handle, true);
+      return WASI_ESUCCESS;
+    }
+    return WASI_EINVAL;
+  }
+
+  function path_unlink_file(fd, pathPtr, pathLen) {
+    if (fd !== availFD) return WASI_EINVAL;
+    refreshMemory();
+    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathPtr, pathLen);
+    fs.unlinkSync(jspath);
+    return WASI_ESUCCESS;
   }
 
   function proc_exit(rval) {
@@ -298,15 +450,16 @@ export const WASI = function() {
     environ_sizes_get: environ_sizes_get,
     environ_get: environ_get,
     fd_open: fnfixme('fd_open'),
-    fd_close: fnfixme('fd_close'),
-    fd_seek: fnfixme('fd_seek'),
-    fd_read: fnfixme('fd_read'),
+    fd_close: fd_close,
+    fd_seek: fd_seek,
+    fd_read: fd_read,
     fd_write: fd_write,
     fd_tell: fnfixme('fd_tell'),
     fd_filestat_get: fnfixme('fd_filestat_get'),
     path_readlink: fnfixme('path_readlink'),
-    path_open: fnfixme('path_open'),
+    path_open: path_open,
     path_filestat_get: path_filestat_get,
+    path_unlink_file: path_unlink_file,
     proc_exit: proc_exit,
     clock_time_get: clock_time_get,
   };
