@@ -312,14 +312,17 @@ export const WASI = function() {
       if (!stats) {
         return WASI_EINVAL;
       }
+      let offset = BigInt(stats.offset);
       for (let i = 0; i < iovsLen; i++) {
         const ptr = iovs + i * 8;
         const buf = view.getUint32(ptr, true);
         const bufLen = view.getUint32(ptr + 4, true);
-        bytesWritten += bufLen;
         const data = new Uint8Array(moduleInstanceExports.memory.buffer, buf, bufLen);
-        fs.writeSync(stats.real, data);
+        const rr = fs.writeSync(stats.real, data, 0, bufLen, Number(offset));
+        bytesWritten += rr;
+        offset += BigInt(rr);
       };
+      stats.offset += BigInt(bytesWritten);
     }
     view.setUint32(nwritten, bytesWritten, true);
     return WASI_ESUCCESS;

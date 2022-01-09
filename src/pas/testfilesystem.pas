@@ -18,7 +18,7 @@ constructor TTestFilesystem.Create;
 var
   F: THandle;
   FF: File of Char;
-  S: String = 'ABC123';
+  S: String;
   C: Char;
 begin
   inherited;
@@ -37,8 +37,12 @@ begin
   else
     Writeln('- Not found!');
 
+  S := 'ABC123';
   Writeln('Write ', S ,' to "test.txt"');
-  FileWrite(F, S[1], 6);
+  FileWrite(F, S[1], Length(S));
+  S := 'XYZ';
+  Writeln('Write ', S ,' to "test.txt"');
+  FileWrite(F, S[1], Length(S));
   Writeln('Close file "test.txt"');
   FileClose(F);
 
@@ -68,15 +72,15 @@ begin
   Writeln('Seek to 3');
   FileSeek(F, 3, fsFromBeginning);
   Writeln('Read 3 bytes from "test.txt"');
-  S := '   ';
+  S := '            ';
   FileRead(F, S[1], 3);
   Writeln('- Result: ', S);
 
   Writeln('Seek to 4');
   FileSeek(F, 4, fsFromBeginning);
-  Writeln('Read 6 bytes from "test.txt"');
-  S := '      ';
-  Writeln('- Actual bytes read: ', FileRead(F, S[1], 6), ' bytes');
+  Writeln('Read 100 bytes from "test.txt"');
+  S := '            ';
+  Writeln('- Actual bytes read: ', FileRead(F, S[1], 100), ' bytes');
   Writeln('- Result: ', S);
 
   Writeln('Close file "test.txt"');
