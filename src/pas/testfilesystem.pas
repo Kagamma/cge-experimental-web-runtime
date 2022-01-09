@@ -42,9 +42,10 @@ begin
   Writeln('Close file "test.txt"');
   FileClose(F);
 
-  Writeln('Get "test.txt" size');
+  Writeln('Open file "test.txt" with Assign() & Reset()');
   Assign(FF, 'test.txt');
   Reset(FF);
+  Writeln('Get "test.txt" size');
   Writeln('- ', FileSize(FF), ' bytes');
   Writeln('Read everthing from "test.txt"');
   S := '';
