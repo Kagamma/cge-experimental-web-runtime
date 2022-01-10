@@ -465,7 +465,7 @@ export const WASI = function() {
     return WASI_ESUCCESS;
   }
 
-  function path_remove_directory(fd) {
+  function path_remove_directory(fd, pathStr, pathLen) {
     if (fd !== availFD) return WASI_EINVAL;
     refreshMemory();
     const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathStr, pathLen);

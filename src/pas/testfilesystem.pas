@@ -112,6 +112,9 @@ begin
     Writeln('- Found!')
   else
     Writeln('- Not found!');
+
+  Writeln('Delete directory ', FileName);
+  RemoveDir(DirectoryName);
 end;
 
 end.
