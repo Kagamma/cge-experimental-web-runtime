@@ -113,7 +113,7 @@ begin
   else
     Writeln('- Not found!');
 
-  Writeln('Delete directory ', FileName);
+  Writeln('Delete directory ', DirectoryName);
   RemoveDir(DirectoryName);
 end;
 
