@@ -21,11 +21,18 @@ export class FPHTTPClient extends Object{
     return result;
   }
 
-  getAsync = async (url, callback) => {
+  getAsync = async (url, headersJson, callback) => {
     this.refreshMemory();
     const jsurl = this.getJSString(url);
+    const jsHeadersJson = this.getJSString(headersJson);
+    const headers = {};
+    try {
+      headers = JSON.parse(jsHeadersJson);
+    } catch (error) {
+    }
     const response = await fetch(jsurl, {
       method: 'GET',
+      headers,
     });
     const data = new Uint8Array(await response.arrayBuffer());
     const len = data.byteLength;

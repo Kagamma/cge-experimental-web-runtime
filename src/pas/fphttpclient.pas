@@ -8,13 +8,13 @@ type
   TFPHTTPClient = class
   public
     class function SimpleGet(Url: String): String;
-    class procedure SimpleGetAsync(Url: String; Response: TAsyncResponse);
+    class procedure SimpleGetAsync(Url, HeadersJson: String; Response: TAsyncResponse);
   end;
 
 implementation
 
 function Get(Url: PChar; Size: Pointer): Pointer; external 'fphttpclient' name 'get';
-procedure GetAsync(Url: PChar; Response: Uint64); external 'fphttpclient' name 'getAsync';
+procedure GetAsync(Url, HeadersJson: PChar; Response: Uint64); external 'fphttpclient' name 'getAsync';
 
 procedure ExecuteAsyncResponse(const Response: Uint64; const Data: Pointer; const Size: Cardinal);
 begin
@@ -35,9 +35,9 @@ begin
   FreeMem(P);
 end;
 
-class procedure TFPHTTPClient.SimpleGetAsync(Url: String; Response: TAsyncResponse);
+class procedure TFPHTTPClient.SimpleGetAsync(Url, HeadersJson: String; Response: TAsyncResponse);
 begin
-  GetAsync(PChar(Url), Uint64(Response));
+  GetAsync(PChar(Url), PChar(HeadersJson), Uint64(Response));
 end;
 
 exports

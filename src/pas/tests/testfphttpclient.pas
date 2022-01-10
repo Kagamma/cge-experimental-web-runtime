@@ -24,7 +24,7 @@ begin
   Writeln('Result from get: ');
   Writeln('- ', TFPHTTPClient.SimpleGet('/index.html'));
   Writeln('Async Get /index.html');
-  TFPHTTPClient.SimpleGetAsync('/index.html', @Self.Response);
+  TFPHTTPClient.SimpleGetAsync('/index.html', '{}', @Self.Response);
 end;
 
 procedure TTestFPHTTPClient.Response(Data: Pointer; Size: Cardinal);
