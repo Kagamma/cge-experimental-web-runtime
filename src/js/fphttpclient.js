@@ -1,4 +1,4 @@
-import * as fetch from 'sync-fetch';
+import * as fetchSync from 'sync-fetch';
 import { Object } from './classes';
 
 export class FPHTTPClient extends Object{
@@ -9,14 +9,29 @@ export class FPHTTPClient extends Object{
   get = (url, size) => {
     this.refreshMemory();
     const jsurl = this.getJSString(url);
-    const response = fetch(jsurl, {
+    const response = fetchSync(jsurl, {
       method: 'GET',
     });
     const data = new Uint8Array(response.arrayBuffer());
-    const result = this.allocMem(data.byteLength);
-    const dataMap = new Uint8Array(this.instance.memory.buffer, result, data.byteLength);
-    this.view.setUint32(size, data.byteLength, true);
+    const len = data.byteLength;
+    const result = this.allocMem(len);
+    const dataMap = new Uint8Array(this.instance.memory.buffer, result, len);
+    this.view.setUint32(size, len, true);
     dataMap.set(data);
     return result;
+  }
+
+  getAsync = async (url, callback) => {
+    this.refreshMemory();
+    const jsurl = this.getJSString(url);
+    const response = await fetch(jsurl, {
+      method: 'GET',
+    });
+    const data = new Uint8Array(await response.arrayBuffer());
+    const len = data.byteLength;
+    const result = this.allocMem(len);
+    const dataMap = new Uint8Array(this.instance.memory.buffer, result, len);
+    dataMap.set(data);
+    this.instance.ExecuteAsyncResponse(callback, result, len);
   }
 };
