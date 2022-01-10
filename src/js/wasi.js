@@ -288,6 +288,16 @@ export const WASI = function() {
     return WASI_ESUCCESS;
   }
 
+  function fd_filestat_set_size(fd, size) {
+    if (fd !== availFD) return WASI_EINVAL;
+    const stats = handles[fd];
+    if (!stats) {
+      return WASI_EINVAL;
+    }
+    fs.ftruncateSync(stats.real, Number(size));
+    return WASI_ESUCCESS;
+  }
+
   function fd_write(fd, iovs, iovsLen, nwritten) {
     refreshMemory();
     let bytesWritten = 0;
@@ -457,6 +467,14 @@ export const WASI = function() {
     return WASI_EINVAL;
   }
 
+  function path_unlink_file(fd, pathPtr, pathLen) {
+    if (fd !== availFD) return WASI_EINVAL;
+    refreshMemory();
+    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathPtr, pathLen);
+    fs.unlinkSync(jspath);
+    return WASI_ESUCCESS;
+  }
+
   function path_create_directory(fd, pathStr, pathLen) {
     if (fd !== availFD) return WASI_EINVAL;
     refreshMemory();
@@ -470,14 +488,6 @@ export const WASI = function() {
     refreshMemory();
     const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathStr, pathLen);
     fs.rmdirSync(jspath);
-    return WASI_ESUCCESS;
-  }
-
-  function path_unlink_file(fd, pathPtr, pathLen) {
-    if (fd !== availFD) return WASI_EINVAL;
-    refreshMemory();
-    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathPtr, pathLen);
-    fs.unlinkSync(jspath);
     return WASI_ESUCCESS;
   }
 
@@ -510,12 +520,13 @@ export const WASI = function() {
     fd_write: fd_write,
     fd_tell: fd_tell,
     fd_filestat_get: fd_filestat_get,
+    fd_filestat_set_size: fd_filestat_set_size,
     path_readlink: fnfixme('path_readlink'),
     path_open: path_open,
+    path_unlink_file: path_unlink_file,
     path_create_directory: path_create_directory,
     path_remove_directory: path_remove_directory,
     path_filestat_get: path_filestat_get,
-    path_unlink_file: path_unlink_file,
     proc_exit: proc_exit,
     clock_time_get: clock_time_get,
   };
