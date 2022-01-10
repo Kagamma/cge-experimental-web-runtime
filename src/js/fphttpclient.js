@@ -6,11 +6,18 @@ export class FPHTTPClient extends Object{
     super();
   }
 
-  get = (url, size) => {
+  get = (url, headersJson, size) => {
     this.refreshMemory();
     const jsurl = this.getJSString(url);
+    const jsHeadersJson = this.getJSString(headersJson);
+    const headers = {};
+    try {
+      headers = JSON.parse(jsHeadersJson);
+    } catch (error) {
+    }
     const response = fetchSync(jsurl, {
       method: 'GET',
+      headers,
     });
     const data = new Uint8Array(response.arrayBuffer());
     const len = data.byteLength;

@@ -7,13 +7,13 @@ type
 
   TFPHTTPClient = class
   public
-    class function SimpleGet(Url: String): String;
+    class function SimpleGet(Url, HeadersJson: String): String;
     class procedure SimpleGetAsync(Url, HeadersJson: String; Response: TAsyncResponse);
   end;
 
 implementation
 
-function Get(Url: PChar; Size: Pointer): Pointer; external 'fphttpclient' name 'get';
+function Get(Url, HeadersJson: PChar; Size: Pointer): Pointer; external 'fphttpclient' name 'get';
 procedure GetAsync(Url, HeadersJson: PChar; Response: Uint64); external 'fphttpclient' name 'getAsync';
 
 procedure ExecuteAsyncResponse(const Response: Uint64; const Data: Pointer; const Size: Cardinal);
@@ -22,13 +22,13 @@ begin
     TAsyncResponse(Response)(Data, Size);
 end;
 
-class function TFPHTTPClient.SimpleGet(Url: String): String;
+class function TFPHTTPClient.SimpleGet(Url, HeadersJson: String): String;
 var
   P: Pointer;
   Size: Cardinal;
   I: Integer;
 begin
-  P := Get(PChar(Url), @Size);
+  P := Get(PChar(Url), PChar(HeadersJson), @Size);
   Result := '';
   for I := 0 to Size - 1 do
     Result := Result + Char((P + I)^);

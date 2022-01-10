@@ -22,7 +22,7 @@ begin
   Writeln('TODO: TFPHTTPClient');
   Writeln('Get /index.html');
   Writeln('Result from get: ');
-  Writeln('- ', TFPHTTPClient.SimpleGet('/index.html'));
+  Writeln('- ', TFPHTTPClient.SimpleGet('/index.html', '{}'));
   Writeln('Async Get /index.html');
   TFPHTTPClient.SimpleGetAsync('/index.html', '{}', @Self.Response);
 end;
@@ -36,6 +36,7 @@ begin
     S := S + Char((Data + I)^);
   Writeln('Result from async get: ');
   Writeln('- ', S);
+  FreeMem(Data);
 end;
 
 end.
