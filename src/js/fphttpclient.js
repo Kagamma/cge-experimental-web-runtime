@@ -13,8 +13,7 @@ export class FPHTTPClient extends Object{
       method: 'GET',
     });
     const data = new Uint8Array(response.arrayBuffer());
-    const result = this.instance.AllocMem(data.byteLength);
-    this.refreshMemory();
+    const result = this.allocMem(data.byteLength);
     const dataMap = new Uint8Array(this.instance.memory.buffer, result, data.byteLength);
     this.view.setUint32(size, data.byteLength, true);
     dataMap.set(data);

@@ -19,4 +19,10 @@ export class Object {
   getJSString = (s, len = -1) => {
     return pcharToJSString(this.view, this.instance.memory.buffer, s, len);
   }
+
+  allocMem = size => {
+    const result = this.instance.AllocMem(size);
+    this.refreshMemory();
+    return result;
+  }
 }
