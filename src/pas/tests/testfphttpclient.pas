@@ -4,7 +4,7 @@ interface
 
 uses
   SysUtils,
-  Window, fphttpclient;
+  Window, webfphttpclient;
 
 type
   TTestFPHTTPClient = class(TWindow)

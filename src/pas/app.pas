@@ -2,7 +2,7 @@ program App;
 
 uses
   SysUtils,
-  OpenGLES, Window, TestTriangle, TestFilesystem, TestTextureQuad, TestFPHTTPClient;
+  Window, TestTriangle, TestFilesystem, TestTextureQuad, TestFPHTTPClient;
 
 var
   Ticks: QWord;

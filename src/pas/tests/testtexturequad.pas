@@ -6,7 +6,7 @@ unit TestTextureQuad;
 interface
 
 uses
-  Window, OpenGLES;
+  Window, WebOpenGLES;
 
 type
   TTestTextureQuad = class(TWindow)

@@ -6,7 +6,7 @@ unit TestTriangle;
 interface
 
 uses
-  Window, OpenGLES;
+  Window, WebOpenGLES;
 
 type
   TTestTriangle = class(TWindow)
