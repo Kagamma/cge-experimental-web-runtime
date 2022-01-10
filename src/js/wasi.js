@@ -1,4 +1,5 @@
 import { fs } from 'memfs';
+import { Object } from './classes';
 import { pcharToJSString } from './utils';
 
 const WASI_ESUCCESS = 0;
@@ -167,49 +168,44 @@ const WASI_STDIN = 0;
 const WASI_STDOUT = 1;
 const WASI_STDERR = 2;
 
-export const WASI = function() {
-  let view = null;
-  let moduleInstanceExports = null;
-  let preOpenDirs = false;
-  let availFD = -1;
-  // Store opened file handles
-  const handles = new Array(65536);
+export class WASI extends Object {
+  constructor() {
+    super();
+    this.preOpenDirs = null;
+    this.availFD = -1;
+    // Store opened file this.handles
+    this.handles = new Array(65536);
+  }
 
   // Private Helpers
-  function getEmptyHandle() {
-    for (let i = 3; i < handles.length; i++){
-      if (handles[i] === undefined) {
+  getEmptyHandle = () => {
+    for (let i = 3; i < this.handles.length; i++){
+      if (this.handles[i] === undefined) {
         return i;
       }
     }
     return 0;
   }
 
-  function createHandle(obj) {
-    const handle = getEmptyHandle();
+  createHandle = (obj) => {
+    const handle = this.getEmptyHandle();
     if (handle === 0) {
       return handle;
     }
-    handles[handle] = obj;
+    this.handles[handle] = obj;
     return handle;
   }
 
-  function releaseHandle(handle) {
+  releaseHandle = (handle) => {
     if (handle === 0) {
       return null;
     }
-    const obj = handles[handle];
-    handles[handle] = undefined;
+    const obj = this.handles[handle];
+    this.handles[handle] = undefined;
     return obj;
   }
 
-  function refreshMemory() {
-    if (!view || view.buffer.byteLength === 0) {
-      view = new DataView(moduleInstanceExports.memory.buffer);
-    }
-  }
-
-  function checkExists(path) {
+  checkExists = (path) => {
     try {
       if (fs.existsSync(path)) {
         return fs.lstatSync(path);
@@ -220,77 +216,66 @@ export const WASI = function() {
   }
 
   // Public APIs
-  function setModuleInstance(instance) {
-    moduleInstanceExports = instance.exports;
-  }
-
-  function fnfixme(name, result = WASI_ESUCCESS) {
-    return () => {
-      console.log('FIXME', name);
-      return result;
-    };
-  }
-
-  function environ_sizes_get(environCount, environBufSize) {
-    refreshMemory();
-    view.setUint32(environCount, 0, true);
-    view.setUint32(environBufSize, 0, true);
+  environ_sizes_get = (environCount, environBufSize) => {
+    this.refreshMemory();
+    this.view.setUint32(environCount, 0, true);
+    this.view.setUint32(environBufSize, 0, true);
     return WASI_ESUCCESS;
   }
 
-  function environ_get(environ, environBuf) {
+  environ_get = (environ, environBuf) => {
     return WASI_ESUCCESS;
   }
 
-  function fd_fdstat_get(fd, result) {
-    refreshMemory();
+  fd_fdstat_get = (fd, result) => {
+    this.refreshMemory();
 
-    view.setUint8(result, fd);
-    view.setUint16(result + 2, 0, true);
-    view.setUint16(result + 4, 0, true);
+    this.view.setUint8(result, fd);
+    this.view.setUint16(result + 2, 0, true);
+    this.view.setUint16(result + 4, 0, true);
 
-    view.setBigUint64(result + 8, BigInt(0), true);
-    view.setBigUint64(result + 8 + 8, BigInt(0), true);
+    this.view.setBigUint64(result + 8, BigInt(0), true);
+    this.view.setBigUint64(result + 8 + 8, BigInt(0), true);
     return WASI_ESUCCESS;
   }
 
-  function fd_prestat_get(fd, result) {
-    refreshMemory();
+  fd_prestat_get = (fd, result) => {
+    this.refreshMemory();
     // Simulate preopen dir
-    if (!preOpenDirs) {
-      preOpenDirs = true;
-      availFD = fd;
-      view.setUint8(result, WASI_PREOPENTYPE_DIR); // tag
-      view.setUint32(result + 4, 1, true); // Name len, '/'
+    if (!this.preOpenDirs) {
+      this.preOpenDirs = true;
+      this.availFD = fd;
+      this.view.setUint8(result, WASI_PREOPENTYPE_DIR); // tag
+      this.view.setUint32(result + 4, 1, true); // Name len, '/'
       return WASI_ESUCCESS;
     }
     return WASI_EBADF;
   }
 
-  function fd_prestat_dir_name(fd, pathPtr, pathLen) {
-    if (fd !== availFD) return WASI_EINVAL;
-    refreshMemory();
-    view.setUint8(pathPtr, '/'.charCodeAt(0)); // Name, '/'
+  fd_prestat_dir_name = (fd, pathPtr, pathLen) => {
+    if (fd !== this.availFD) return WASI_EINVAL;
+    this.refreshMemory();
+    this.view.setUint8(pathPtr, '/'.charCodeAt(0)); // Name, '/'
     return WASI_ESUCCESS;
   }
 
-  function fd_filestat_get(fd, result) {
-    if (fd !== availFD) return WASI_EINVAL;
-    refreshMemory();
-    const stats = handles[fd];
+  fd_filestat_get = (fd, result) => {
+    if (fd !== this.availFD) return WASI_EINVAL;
+    this.refreshMemory();
+    const stats = this.handles[fd];
     if (!stats) {
       return WASI_EINVAL;
     }
     // Pass file attributes to result
     const rstats = fs.fstatSync(stats.real);
-    view.setUint8(result + 16, rstats.filetype);
-    view.setBigUint64(result + 32, BigInt(rstats.size), true);
+    this.view.setUint8(result + 16, rstats.filetype);
+    this.view.setBigUint64(result + 32, BigInt(rstats.size), true);
     return WASI_ESUCCESS;
   }
 
-  function fd_filestat_set_size(fd, size) {
-    if (fd !== availFD) return WASI_EINVAL;
-    const stats = handles[fd];
+  fd_filestat_set_size = (fd, size) => {
+    if (fd !== this.availFD) return WASI_EINVAL;
+    const stats = this.handles[fd];
     if (!stats) {
       return WASI_EINVAL;
     }
@@ -298,18 +283,18 @@ export const WASI = function() {
     return WASI_ESUCCESS;
   }
 
-  function fd_write(fd, iovs, iovsLen, nwritten) {
-    refreshMemory();
+  fd_write = (fd, iovs, iovsLen, nwritten) => {
+    this.refreshMemory();
     let bytesWritten = 0;
     if (fd < 3) {
       // Write to console
       let s = '';
       for (let i = 0; i < iovsLen; i++) {
         const ptr = iovs + i * 8;
-        const buf = view.getUint32(ptr, true);
-        const bufLen = view.getUint32(ptr + 4, true);
+        const buf = this.view.getUint32(ptr, true);
+        const bufLen = this.view.getUint32(ptr + 4, true);
         bytesWritten += bufLen;
-        s += pcharToJSString(view, moduleInstanceExports.memory.buffer, buf, bufLen);
+        s += pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, buf, bufLen);
       };
       if (fd === WASI_STDOUT) {
         console.log(s);
@@ -319,41 +304,41 @@ export const WASI = function() {
       }
     } else {
       // Write to file
-      const stats = handles[fd];
+      const stats = this.handles[fd];
       if (!stats) {
         return WASI_EINVAL;
       }
       let offset = BigInt(stats.offset);
       for (let i = 0; i < iovsLen; i++) {
         const ptr = iovs + i * 8;
-        const buf = view.getUint32(ptr, true);
-        const bufLen = view.getUint32(ptr + 4, true);
-        const data = new Uint8Array(moduleInstanceExports.memory.buffer, buf, bufLen);
+        const buf = this.view.getUint32(ptr, true);
+        const bufLen = this.view.getUint32(ptr + 4, true);
+        const data = new Uint8Array(this.moduleInstanceExports.memory.buffer, buf, bufLen);
         const rr = fs.writeSync(stats.real, data, 0, bufLen, Number(offset));
         bytesWritten += rr;
         offset += BigInt(rr);
       };
       stats.offset += BigInt(bytesWritten);
     }
-    view.setUint32(nwritten, bytesWritten, true);
+    this.view.setUint32(nwritten, bytesWritten, true);
     return WASI_ESUCCESS;
   }
 
-  function fd_read(fd, iovs, iovsLen, nread) {
-    refreshMemory();
+  fd_read = (fd, iovs, iovsLen, nread) => {
+    this.refreshMemory();
     let bytesRead = 0;
     if (fd >= 3) {
       // Read from file
-      const stats = handles[fd];
+      const stats = this.handles[fd];
       if (!stats) {
         return WASI_EINVAL;
       }
       let offset = BigInt(stats.offset);
       for (let i = 0; i < iovsLen; i++) {
         const ptr = iovs + i * 8;
-        const buf = view.getUint32(ptr, true);
-        const bufLen = view.getUint32(ptr + 4, true);
-        const data = new Uint8Array(moduleInstanceExports.memory.buffer, buf, bufLen);
+        const buf = this.view.getUint32(ptr, true);
+        const bufLen = this.view.getUint32(ptr + 4, true);
+        const data = new Uint8Array(this.moduleInstanceExports.memory.buffer, buf, bufLen);
         data._isBuffer = true; // Workaround "not a buffer" issue
         const rr = fs.readSync(stats.real, data, 0, bufLen, Number(offset));
         bytesRead += rr;
@@ -365,15 +350,15 @@ export const WASI = function() {
       };
       stats.offset += BigInt(bytesRead);
     }
-    view.setUint32(nread, bytesRead, true);
+    this.view.setUint32(nread, bytesRead, true);
     return WASI_ESUCCESS;
   }
 
-  function fd_seek(fd, offset, whence, result) {
-    refreshMemory();
+  fd_seek = (fd, offset, whence, result) => {
+    this.refreshMemory();
     if (fd >= 3) {
       // Seek from file
-      const stats = handles[fd];
+      const stats = this.handles[fd];
       if (!stats) {
         return WASI_EINVAL;
       }
@@ -389,23 +374,23 @@ export const WASI = function() {
           stats.offset = BigInt(rstats.size) + BigInt(offset);
           break;
       }
-      view.setBigUint64(result, stats.offset, true);
+      this.view.setBigUint64(result, stats.offset, true);
     }
     return WASI_ESUCCESS;
   }
 
-  function fd_tell(fd, result) {
-    refreshMemory();
-    const stats = handles[fd];
+  fd_tell = (fd, result) => {
+    this.refreshMemory();
+    const stats = this.handles[fd];
     if (!stats) {
       return WASI_EINVAL;
     }
-    view.setBigUint64(result, stats.offset, true);
+    this.view.setBigUint64(result, stats.offset, true);
     return WASI_ESUCCESS;
   }
 
-  function fd_close(fd) {
-    const stats = releaseHandle(fd);
+  fd_close = (fd) => {
+    const stats = this.releaseHandle(fd);
     if (!stats) {
       return WASI_EINVAL;
     }
@@ -413,11 +398,11 @@ export const WASI = function() {
     return WASI_ESUCCESS;
   }
 
-  function path_filestat_get(fd, flags, pathPtr, pathLen, result) {
-    if (fd !== availFD) return WASI_EINVAL;
-    refreshMemory();
-    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathPtr, pathLen);
-    const stats = checkExists(jspath);
+  path_filestat_get = (fd, flags, pathPtr, pathLen, result) => {
+    if (fd !== this.availFD) return WASI_EINVAL;
+    this.refreshMemory();
+    const jspath = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, pathPtr, pathLen);
+    const stats = this.checkExists(jspath);
     if (stats && (stats.isFile() || stats.isDirectory())) {
       let filetype = WASI_FILETYPE_UNKNOWN;
       switch (true) {
@@ -428,16 +413,16 @@ export const WASI = function() {
           filetype = WASI_FILETYPE_DIRECTORY;
           break;
       }
-      view.setUint8(result + 16, filetype);
-      view.setBigUint64(result + 32, BigInt(stats.size), true);
+      this.view.setUint8(result + 16, filetype);
+      this.view.setBigUint64(result + 32, BigInt(stats.size), true);
       return WASI_ESUCCESS;
     }
     return WASI_EINVAL;
   }
 
-  function path_open(fd, dirflags, path, oflags, fs_rights_base, fs_rights_inheriting, fdflags, empty, resultfs) {
-    if (fd !== availFD) return WASI_EINVAL;
-    refreshMemory();
+  path_open = (fd, dirflags, path, oflags, fs_rights_base, fs_rights_inheriting, fdflags, empty, resultfs) => {
+    if (fd !== this.availFD) return WASI_EINVAL;
+    this.refreshMemory();
     fs_rights_base = BigInt(fs_rights_base);
     const read = (fs_rights_base & (WASI_RIGHT_FD_READ | WASI_RIGHT_FD_READDIR)) !== BigInt(0);
     const write = (fs_rights_base & (WASI_RIGHT_FD_DATASYNC | WASI_RIGHT_FD_WRITE | WASI_RIGHT_FD_ALLOCATE | WASI_RIGHT_FD_FILESTAT_SET_SIZE)) !== BigInt(0);
@@ -447,13 +432,13 @@ export const WASI = function() {
     } else if (write) {
       flags = 'w';
     }
-    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, path);
-    const stats = checkExists(jspath);
+    const jspath = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, path);
+    const stats = this.checkExists(jspath);
     if (!stats || stats.isFile()) {
       // Create new file if it's not exists
       if (!stats) fs.appendFileSync(jspath, '');
       // Prepare handle
-      const handle = createHandle({
+      const handle = this.createHandle({
         real: fs.openSync(jspath, flags),
         path: jspath,
         read,
@@ -461,73 +446,53 @@ export const WASI = function() {
         offset: BigInt(0),
       });
       // Write handle to result
-      view.setUint32(resultfs, handle, true);
+      this.view.setUint32(resultfs, handle, true);
       return WASI_ESUCCESS;
     }
     return WASI_EINVAL;
   }
 
-  function path_unlink_file(fd, pathPtr, pathLen) {
-    if (fd !== availFD) return WASI_EINVAL;
-    refreshMemory();
-    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathPtr, pathLen);
+  path_unlink_file = (fd, pathPtr, pathLen) => {
+    if (fd !== this.availFD) return WASI_EINVAL;
+    this.refreshMemory();
+    const jspath = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, pathPtr, pathLen);
     fs.unlinkSync(jspath);
     return WASI_ESUCCESS;
   }
 
-  function path_create_directory(fd, pathStr, pathLen) {
-    if (fd !== availFD) return WASI_EINVAL;
-    refreshMemory();
-    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathStr, pathLen);
+  path_create_directory = (fd, pathStr, pathLen) => {
+    if (fd !== this.availFD) return WASI_EINVAL;
+    this.refreshMemory();
+    const jspath = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, pathStr, pathLen);
     fs.mkdirSync(jspath);
     return WASI_ESUCCESS;
   }
 
-  function path_remove_directory(fd, pathStr, pathLen) {
-    if (fd !== availFD) return WASI_EINVAL;
-    refreshMemory();
-    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathStr, pathLen);
+  path_remove_directory = (fd, pathStr, pathLen) => {
+    if (fd !== this.availFD) return WASI_EINVAL;
+    this.refreshMemory();
+    const jspath = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, pathStr, pathLen);
     fs.rmdirSync(jspath);
     return WASI_ESUCCESS;
   }
 
-  function proc_exit(rval) {
+  path_readlink = () => {
+    console.log('FIXME', 'path_readlink');
+    return WASI_ESUCCESS;
+  }
+
+  proc_exit = (rval) => {
     if (rval !== 0) {
       throw new Error('Program exit with error code ' + rval);
     }
     return WASI_ENOSYS;
   }
 
-  function clock_time_get(id, precision, result) {
-    refreshMemory();
+  clock_time_get = (id, precision, result) => {
+    this.refreshMemory();
     // We ignore the id & precision of the clock for now
     const date = new Date();
-    view.setBigUint64(result, BigInt(date.getTime()) * BigInt(1000000), true);
+    this.view.setBigUint64(result, BigInt(date.getTime()) * BigInt(1000000), true);
     return WASI_ESUCCESS;
   }
-
-  return {
-    setModuleInstance: setModuleInstance,
-    fd_fdstat_get: fd_fdstat_get,
-    fd_prestat_get: fd_prestat_get,
-    fd_prestat_dir_name: fd_prestat_dir_name,
-    environ_sizes_get: environ_sizes_get,
-    environ_get: environ_get,
-    fd_open: fnfixme('fd_open'),
-    fd_close: fd_close,
-    fd_seek: fd_seek,
-    fd_read: fd_read,
-    fd_write: fd_write,
-    fd_tell: fd_tell,
-    fd_filestat_get: fd_filestat_get,
-    fd_filestat_set_size: fd_filestat_set_size,
-    path_readlink: fnfixme('path_readlink'),
-    path_open: path_open,
-    path_unlink_file: path_unlink_file,
-    path_create_directory: path_create_directory,
-    path_remove_directory: path_remove_directory,
-    path_filestat_get: path_filestat_get,
-    proc_exit: proc_exit,
-    clock_time_get: clock_time_get,
-  };
 };
