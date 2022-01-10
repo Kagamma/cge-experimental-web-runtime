@@ -5,19 +5,23 @@ interface
 type
   TFPHTTPClient = class
   public
-    class procedure SimpleGet(Url: PChar);
+    class function SimpleGet(Url: String): String;
   end;
 
 implementation
 
 function Get(Url: PChar; Size: Pointer): Pointer; external 'fphttpclient' name 'get';
 
-class procedure TFPHTTPClient.SimpleGet(Url: PChar);
+class function TFPHTTPClient.SimpleGet(Url: String): String;
 var
   P: Pointer;
   Size: LongWord;
+  I: Integer;
 begin
-  P := Get(Url, @Size);
+  P := Get(PChar(Url), @Size);
+  Result := '';
+  for I := 0 to Size - 1 do
+    Result := Result + Char((P + I)^);
   FreeMem(P);
 end;
 

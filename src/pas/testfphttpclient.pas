@@ -18,7 +18,8 @@ constructor TTestFPHTTPClient.Create;
 begin
   inherited;
   Writeln('TODO: TFPHTTPClient');
-  TFPHTTPClient.SimpleGet('/test.wasm');
+  Writeln('Get /index.html');
+  Writeln('- ', TFPHTTPClient.SimpleGet('/index.html'));
 end;
 
 end.
