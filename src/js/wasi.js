@@ -175,6 +175,7 @@ export const WASI = function() {
   // Store opened file handles
   const handles = new Array(65536);
 
+  // Private Helpers
   function getEmptyHandle() {
     for (let i = 3; i < handles.length; i++){
       if (handles[i] === undefined) {
@@ -202,7 +203,6 @@ export const WASI = function() {
     return obj;
   }
 
-  // Private Helpers
   function refreshMemory() {
     if (!view || view.buffer.byteLength === 0) {
       view = new DataView(moduleInstanceExports.memory.buffer);

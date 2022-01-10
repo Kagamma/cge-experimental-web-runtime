@@ -10,6 +10,7 @@ export function OpenGLES(gl) {
   const uniformLocationHeap = new Array(1024 * 64);
   let uniformLocationPtr = 0;
 
+  // Private Helpers
   function getEmptyHandle() {
     for (let i = 1; i < objHeap.length; i++){
       if (objHeap[i] === undefined) {
@@ -63,7 +64,6 @@ export function OpenGLES(gl) {
     return handle;
   }
 
-  // Private Helpers
   function refreshMemory() {
     if (!view || view.buffer.byteLength === 0) {
       view = new DataView(moduleInstanceExports.memory.buffer);

@@ -2,7 +2,7 @@ program App;
 
 uses
   SysUtils,
-  OpenGLES, Window, TestTriangle, TestFilesystem, TestTextureQuad;
+  OpenGLES, Window, TestTriangle, TestFilesystem, TestTextureQuad, TestFPHTTPClient;
 
 var
   Ticks: QWord;
@@ -28,6 +28,13 @@ begin
   Win := TTestFilesystem.Create;
 end;
 
+procedure InitFPHTTPClient;
+begin
+  if Win <> nil then
+    FreeAndNil(Win);
+  Win := TTestFPHTTPClient.Create;
+end;
+
 procedure Run;
 var
   DeltaTime: Single;
@@ -43,6 +50,7 @@ exports
   InitTestTriangle,
   InitTestTextureQuad,
   InitTestFilesystem,
+  InitFPHTTPClient,
   Run;
 
 begin

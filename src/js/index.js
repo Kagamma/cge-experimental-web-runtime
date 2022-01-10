@@ -1,5 +1,6 @@
 import { WASI } from './wasi';
 import { OpenGLES } from './opengles';
+import { FPHTTPClient } from './fphttpclient';
 
 function main() {
   const menu = document.createElement('div');
@@ -36,57 +37,39 @@ function main() {
 
   const wasi = new WASI();
   const opengles = new OpenGLES(gl);
+  const fphttpclient = new FPHTTPClient();
   const importModule = {
     wasi_snapshot_preview1: wasi,
-    opengles: opengles,
+    opengles,
+    fphttpclient,
   };
 
   (async () => {
     const result = await WebAssembly.instantiateStreaming(fetch('app.wasm'), importModule);
     wasi.setModuleInstance(result.instance);
     opengles.setModuleInstance(result.instance);
+    fphttpclient.setModuleInstance(result.instance);
     result.instance.exports._start();
 
-    const buttonTriangleTest = document.createElement('button');
-    buttonTriangleTest.innerHTML = 'Rotate triangle';
-    buttonTriangleTest.style.margin = '0 4px 0 4px';
-    buttonTriangleTest.onclick = () => {
-      result.instance.exports.InitTestTriangle();
-      result.instance.exports.EventResize(canvas.offsetWidth, canvas.offsetHeight);
-      const loop = () => {
-        result.instance.exports.Run();
+    function button(name, func) {
+      const btn = document.createElement('button');
+      btn.innerHTML = name;
+      btn.style.margin = '0 4px 0 4px';
+      btn.onclick = () => {
+        result.instance.exports[func]();
+        result.instance.exports.EventResize(canvas.offsetWidth, canvas.offsetHeight);
+        const loop = () => {
+          result.instance.exports.Run();
+          window.requestAnimationFrame(loop);
+        };
         window.requestAnimationFrame(loop);
       };
-      window.requestAnimationFrame(loop);
-    };
-    menu.appendChild(buttonTriangleTest);
-
-    const buttonTextureQuadTest = document.createElement('button');
-    buttonTextureQuadTest.innerHTML = 'Texture quad';
-    buttonTextureQuadTest.style.margin = '0 4px 0 4px';
-    buttonTextureQuadTest.onclick = () => {
-      result.instance.exports.InitTestTextureQuad();
-      result.instance.exports.EventResize(canvas.offsetWidth, canvas.offsetHeight);
-      const loop = () => {
-        result.instance.exports.Run();
-        window.requestAnimationFrame(loop);
-      };
-      window.requestAnimationFrame(loop);
-    };
-    menu.appendChild(buttonTextureQuadTest);
-
-    const buttonFilesystemTest = document.createElement('button');
-    buttonFilesystemTest.innerHTML = 'Filesystem';
-    buttonFilesystemTest.style.margin = '0 4px 0 4px';
-    buttonFilesystemTest.onclick = () => {
-      result.instance.exports.InitTestFilesystem();
-      const loop = () => {
-        result.instance.exports.Run();
-        window.requestAnimationFrame(loop);
-      };
-      window.requestAnimationFrame(loop);
-    };
-    menu.appendChild(buttonFilesystemTest);
+      menu.appendChild(btn);
+    }
+    button('Rotate triangle', 'InitTestTriangle');
+    button('Texture quad', 'InitTestTextureQuad');
+    button('Filesystem', 'InitTestFilesystem');
+    button('FPHTTPClient', 'InitFPHTTPClient');
   })();
 }
 
