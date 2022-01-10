@@ -67,10 +67,6 @@ export class OpenGLES extends Object {
   }
 
   // Public APIs
-  setModuleInstance = (instance) => {
-    this.moduleInstanceExports = instance.exports;
-  }
-
   // OpenGL ES 2.0
   glActiveTexture = (texture) => {
     this.gl.activeTexture(texture);
@@ -84,7 +80,7 @@ export class OpenGLES extends Object {
 
   glBindAttribLocation = (handle, indx, name) => {
     this.refreshMemory();
-    const s = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, name);
+    const s = this.getJSString(name);
     this.gl.bindAttribLocation(this.objHeap[handle], indx, s);
   }
 
@@ -130,13 +126,13 @@ export class OpenGLES extends Object {
 
   glBufferData = (target, size, data, usage) => {
     this.refreshMemory();
-    const buf = new Uint8Array(this.moduleInstanceExports.memory.buffer, data, size);
+    const buf = new Uint8Array(this.instance.memory.buffer, data, size);
     this.gl.bufferData(target, buf, usage);
   }
 
   glBufferSubData = (target, offset, size, data) => {
     this.refreshMemory();
-    const buf = new Uint8Array(this.moduleInstanceExports.memory.buffer, data, size);
+    const buf = new Uint8Array(this.instance.memory.buffer, data, size);
     this.gl.bufferSubData(target, offset, buf);
   }
 
@@ -166,13 +162,13 @@ export class OpenGLES extends Object {
 
   glCompressedTexImage2D = (target, level, internalformat, x, y, width, height, border, imageSize, data) => {
     this.refreshMemory();
-    const buf = new Uint8Array(this.moduleInstanceExports.memory.buffer, data, imageSize);
+    const buf = new Uint8Array(this.instance.memory.buffer, data, imageSize);
     this.gl.compressedTexImage2D(target, level, internalformat, x, y, width, height, border, buf);
   }
 
   glCompressedTexSubImage2D = (target, level, xoffset, yoffset, width, height, format, imageSize, data) => {
     this.refreshMemory();
-    const buf = new Uint8Array(this.moduleInstanceExports.memory.buffer, data, imageSize);
+    const buf = new Uint8Array(this.instance.memory.buffer, data, imageSize);
     this.gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, buf);
   }
 
@@ -375,7 +371,7 @@ export class OpenGLES extends Object {
 
   glGetAttribLocation = (handle, name) => {
     this.refreshMemory();
-    const s = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, name);
+    const s = this.getJSString(name);
     const prog = this.objHeap[handle];
     return this.gl.getAttribLocation(prog, s);
   }
@@ -582,7 +578,7 @@ export class OpenGLES extends Object {
 
   glGetUniformLocation = (handle, name) => {
     this.refreshMemory();
-    const s = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, name);
+    const s = this.getJSString(name);
     return this.createUniformLocationHandle(this.gl.getUniformLocation(this.objHeap[handle], s));
   }
 
@@ -672,7 +668,7 @@ export class OpenGLES extends Object {
 
   glReadPixels = (x, y, width, height, format, type, pixels) => {
     this.refreshMemory();
-    const buf = new Uint8Array(this.moduleInstanceExports.memory.buffer, pixels, width * height * 4);
+    const buf = new Uint8Array(this.instance.memory.buffer, pixels, width * height * 4);
     this.gl.readPixels(x, y, width, height, format, type, buf);
   }
 
@@ -694,7 +690,7 @@ export class OpenGLES extends Object {
       const shader = this.objHeap[handle];
       const source = this.view.getUint32(sources + i * 4, true);
       const len = this.view.getUint32(lengths + i * 4, true);
-      const s = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, source, len);
+      const s = this.getJSString(source, len);
       this.gl.shaderSource(shader, s);
     }
   }
@@ -739,7 +735,7 @@ export class OpenGLES extends Object {
       default:
         size = 4;
     }
-    const buf = new Uint8Array(this.moduleInstanceExports.memory.buffer, pixels, width * height * size);
+    const buf = new Uint8Array(this.instance.memory.buffer, pixels, width * height * size);
     this.gl.texImage2D(target, level, internalformat, width, height, border, format, type, buf);
   }
 
@@ -759,7 +755,7 @@ export class OpenGLES extends Object {
       default:
         size = 4;
     }
-    const buf = new Uint8Array(this.moduleInstanceExports.memory.buffer, pixels, width * height * size);
+    const buf = new Uint8Array(this.instance.memory.buffer, pixels, width * height * size);
     this.gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, buf);
   }
 
@@ -805,56 +801,56 @@ export class OpenGLES extends Object {
 
   glUniform1fv = (handle, count, v) => {
     this.refreshMemory();
-    const buf = new Float32Array(this.moduleInstanceExports.memory.buffer, v, count);
+    const buf = new Float32Array(this.instance.memory.buffer, v, count);
     this.gl.uniform1fv(this.uniformLocationHeap[handle], buf);
   }
 
   glUniform2fv = (handle, count, v) => {
     this.refreshMemory();
-    const buf = new Float32Array(this.moduleInstanceExports.memory.buffer, v, count * 2);
+    const buf = new Float32Array(this.instance.memory.buffer, v, count * 2);
     this.gl.uniform2fv(this.uniformLocationHeap[handle], buf);
   }
 
   glUniform3fv = (handle, count, v) => {
     this.refreshMemory();
-    const buf = new Float32Array(this.moduleInstanceExports.memory.buffer, v, count * 3);
+    const buf = new Float32Array(this.instance.memory.buffer, v, count * 3);
     this.gl.uniform3fv(this.uniformLocationHeap[handle], buf);
   }
 
   glUniform4fv = (handle, count, v) => {
     this.refreshMemory();
-    const buf = new Float32Array(this.moduleInstanceExports.memory.buffer, v, count * 4);
+    const buf = new Float32Array(this.instance.memory.buffer, v, count * 4);
     this.gl.uniform4fv(this.uniformLocationHeap[handle], buf);
   }
 
   glUniform1iv = (handle, count, v) => {
     this.refreshMemory();
-    const buf = new Int32Array(this.moduleInstanceExports.memory.buffer, v, count);
+    const buf = new Int32Array(this.instance.memory.buffer, v, count);
     this.gl.uniform1iv(this.uniformLocationHeap[handle], buf);
   }
 
   glUniform2iv = (handle, count, v) => {
     this.refreshMemory();
-    const buf = new Int32Array(this.moduleInstanceExports.memory.buffer, v, count * 2);
+    const buf = new Int32Array(this.instance.memory.buffer, v, count * 2);
     this.gl.uniform2iv(this.uniformLocationHeap[handle], buf);
   }
 
   glUniform3iv = (handle, count, v) => {
     this.refreshMemory();
-    const buf = new Int32Array(this.moduleInstanceExports.memory.buffer, v, count * 3);
+    const buf = new Int32Array(this.instance.memory.buffer, v, count * 3);
     this.gl.uniform3iv(this.uniformLocationHeap[handle], buf);
   }
 
   glUniform4iv = (handle, count, v) => {
     this.refreshMemory();
-    const buf = new Int32Array(this.moduleInstanceExports.memory.buffer, v, count * 4);
+    const buf = new Int32Array(this.instance.memory.buffer, v, count * 4);
     this.gl.uniform4iv(this.uniformLocationHeap[handle], buf);
   }
 
   glUniformMatrix2fv = (handle, count, transpose, v) => {
     this.refreshMemory();
     for (let i = 0; i < count; i++) {
-      const buf = new Float32Array(this.moduleInstanceExports.memory.buffer, v + i * 8 * 8, 2 * 2);
+      const buf = new Float32Array(this.instance.memory.buffer, v + i * 8 * 8, 2 * 2);
       this.gl.uniformMatrix2fv(this.uniformLocationHeap[handle], transpose, buf);
     }
   }
@@ -862,7 +858,7 @@ export class OpenGLES extends Object {
   glUniformMatrix3fv = (handle, count, transpose, v) => {
     this.refreshMemory();
     for (let i = 0; i < count; i++) {
-      const buf = new Float32Array(this.moduleInstanceExports.memory.buffer, v + i * 12 * 12, 3 * 3);
+      const buf = new Float32Array(this.instance.memory.buffer, v + i * 12 * 12, 3 * 3);
       this.gl.uniformMatrix3fv(this.uniformLocationHeap[handle], transpose, buf);
     }
   }
@@ -870,7 +866,7 @@ export class OpenGLES extends Object {
   glUniformMatrix4fv = (handle, count, transpose, v) => {
     this.refreshMemory();
     for (let i = 0; i < count; i++) {
-      const buf = new Float32Array(this.moduleInstanceExports.memory.buffer, v + i * 16 * 16, 4 * 4);
+      const buf = new Float32Array(this.instance.memory.buffer, v + i * 16 * 16, 4 * 4);
       this.gl.uniformMatrix4fv(this.uniformLocationHeap[handle], transpose, buf);
     }
   }
@@ -897,25 +893,25 @@ export class OpenGLES extends Object {
 
   glVertexAttrib1fv = (index, v) => {
     this.refreshMemory();
-    const buf = new Float32Array(this.moduleInstanceExports.memory.buffer, v, 1);
+    const buf = new Float32Array(this.instance.memory.buffer, v, 1);
     this.gl.vertexAttrib1fv(index, buf);
   }
 
   glVertexAttrib2fv = (index, v) => {
     this.refreshMemory();
-    const buf = new Float32Array(this.moduleInstanceExports.memory.buffer, v, 2);
+    const buf = new Float32Array(this.instance.memory.buffer, v, 2);
     this.gl.vertexAttrib2fv(index, buf);
   }
 
   glVertexAttrib3fv = (index, v) => {
     this.refreshMemory();
-    const buf = new Float32Array(this.moduleInstanceExports.memory.buffer, v, 3);
+    const buf = new Float32Array(this.instance.memory.buffer, v, 3);
     this.gl.vertexAttrib3fv(index, buf);
   }
 
   glVertexAttrib4fv = (index, v) => {
     this.refreshMemory();
-    const buf = new Float32Array(this.moduleInstanceExports.memory.buffer, v, 4);
+    const buf = new Float32Array(this.instance.memory.buffer, v, 4);
     this.gl.vertexAttrib4fv(index, buf);
   }
 
@@ -964,7 +960,7 @@ export class OpenGLES extends Object {
     const strings = new Array(count);
     for (let i = 0; i < count; i++) {
       const sptr = this.view.getUint32(varyings + i * 4, true);
-      const s = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, sptr);
+      const s = this.getJSString(sptr);
       strings[i] = s;
     }
     this.gl.transformFeedbackVaryings(this.objHeap[handle], strings, mode);

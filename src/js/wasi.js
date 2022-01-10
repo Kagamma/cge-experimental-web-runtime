@@ -294,7 +294,7 @@ export class WASI extends Object {
         const buf = this.view.getUint32(ptr, true);
         const bufLen = this.view.getUint32(ptr + 4, true);
         bytesWritten += bufLen;
-        s += pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, buf, bufLen);
+        s += this.getJSString(buf, bufLen);
       };
       if (fd === WASI_STDOUT) {
         console.log(s);
@@ -313,7 +313,7 @@ export class WASI extends Object {
         const ptr = iovs + i * 8;
         const buf = this.view.getUint32(ptr, true);
         const bufLen = this.view.getUint32(ptr + 4, true);
-        const data = new Uint8Array(this.moduleInstanceExports.memory.buffer, buf, bufLen);
+        const data = new Uint8Array(this.instance.memory.buffer, buf, bufLen);
         const rr = fs.writeSync(stats.real, data, 0, bufLen, Number(offset));
         bytesWritten += rr;
         offset += BigInt(rr);
@@ -338,7 +338,7 @@ export class WASI extends Object {
         const ptr = iovs + i * 8;
         const buf = this.view.getUint32(ptr, true);
         const bufLen = this.view.getUint32(ptr + 4, true);
-        const data = new Uint8Array(this.moduleInstanceExports.memory.buffer, buf, bufLen);
+        const data = new Uint8Array(this.instance.memory.buffer, buf, bufLen);
         data._isBuffer = true; // Workaround "not a buffer" issue
         const rr = fs.readSync(stats.real, data, 0, bufLen, Number(offset));
         bytesRead += rr;
@@ -401,7 +401,7 @@ export class WASI extends Object {
   path_filestat_get = (fd, flags, pathPtr, pathLen, result) => {
     if (fd !== this.availFD) return WASI_EINVAL;
     this.refreshMemory();
-    const jspath = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, pathPtr, pathLen);
+    const jspath = this.getJSString(pathPtr, pathLen);
     const stats = this.checkExists(jspath);
     if (stats && (stats.isFile() || stats.isDirectory())) {
       let filetype = WASI_FILETYPE_UNKNOWN;
@@ -432,7 +432,7 @@ export class WASI extends Object {
     } else if (write) {
       flags = 'w';
     }
-    const jspath = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, path);
+    const jspath = this.getJSString(path);
     const stats = this.checkExists(jspath);
     if (!stats || stats.isFile()) {
       // Create new file if it's not exists
@@ -455,7 +455,7 @@ export class WASI extends Object {
   path_unlink_file = (fd, pathPtr, pathLen) => {
     if (fd !== this.availFD) return WASI_EINVAL;
     this.refreshMemory();
-    const jspath = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, pathPtr, pathLen);
+    const jspath = this.getJSString(pathPtr, pathLen);
     fs.unlinkSync(jspath);
     return WASI_ESUCCESS;
   }
@@ -463,7 +463,7 @@ export class WASI extends Object {
   path_create_directory = (fd, pathStr, pathLen) => {
     if (fd !== this.availFD) return WASI_EINVAL;
     this.refreshMemory();
-    const jspath = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, pathStr, pathLen);
+    const jspath = this.getJSString(pathStr, pathLen);
     fs.mkdirSync(jspath);
     return WASI_ESUCCESS;
   }
@@ -471,7 +471,7 @@ export class WASI extends Object {
   path_remove_directory = (fd, pathStr, pathLen) => {
     if (fd !== this.availFD) return WASI_EINVAL;
     this.refreshMemory();
-    const jspath = pcharToJSString(this.view, this.moduleInstanceExports.memory.buffer, pathStr, pathLen);
+    const jspath = this.getJSString(pathStr, pathLen);
     fs.rmdirSync(jspath);
     return WASI_ESUCCESS;
   }

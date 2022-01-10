@@ -4,7 +4,7 @@ interface
 
 uses
   SysUtils,
-  Window;
+  Window, fphttpclient;
 
 type
   TTestFPHTTPClient = class(TWindow)
@@ -18,6 +18,7 @@ constructor TTestFPHTTPClient.Create;
 begin
   inherited;
   Writeln('TODO: TFPHTTPClient');
+  TFPHTTPClient.SimpleGet('/test.wasm');
 end;
 
 end.
