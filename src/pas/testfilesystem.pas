@@ -26,8 +26,20 @@ begin
   inherited;
   Writeln('TODO: Filesystem');
 
+  Writeln('Looking for directory ', DirectoryName, '...');
+  if DirectoryExists(DirectoryName) then
+    Writeln('- Found!')
+  else
+    Writeln('- Not found!');
+
   Writeln('Create directory "', DirectoryName, '"');
   CreateDir(DirectoryName);
+
+  Writeln('Looking for directory ', DirectoryName, '...');
+  if DirectoryExists(DirectoryName) then
+    Writeln('- Found!')
+  else
+    Writeln('- Not found!');
 
   Writeln('Looking for ', FileName, '...');
   if FileExists(FileName) then

@@ -403,10 +403,10 @@ export const WASI = function() {
     return WASI_ESUCCESS;
   }
 
-  function path_filestat_get(fd, flags, path, result) {
+  function path_filestat_get(fd, flags, pathPtr, pathLen, result) {
     if (fd !== availFD) return WASI_EINVAL;
     refreshMemory();
-    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, path);
+    const jspath = pcharToJSString(view, moduleInstanceExports.memory.buffer, pathPtr, pathLen);
     const stats = checkExists(jspath);
     if (stats && (stats.isFile() || stats.isDirectory())) {
       let filetype = WASI_FILETYPE_UNKNOWN;
