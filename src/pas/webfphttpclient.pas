@@ -3,36 +3,21 @@ unit webfphttpclient;
 interface
 
 type
-  TAsyncResponse = procedure(Data: Pointer; Size: Cardinal) of object;
+  TAsyncResponse = procedure(Status: Cardinal; Data: Pointer; Size: Cardinal) of object;
 
   TFPHTTPClient = class
   public
-    class function SimpleGet(Url, HeadersJson: String): String;
     class procedure SimpleGetAsync(Url, HeadersJson: String; Response: TAsyncResponse);
   end;
 
 implementation
 
-function Get(Url, HeadersJson: PChar; Size: Pointer): Pointer; external 'fphttpclient' name 'get';
 procedure GetAsync(Url, HeadersJson: PChar; Response: Uint64); external 'fphttpclient' name 'getAsync';
 
-procedure ExecuteAsyncResponse(const Response: Uint64; const Data: Pointer; const Size: Cardinal);
+procedure ExecuteAsyncResponse(const Response: Uint64; const Status: Cardinal; const Data: Pointer; const Size: Cardinal);
 begin
   if Response <> 0 then
-    TAsyncResponse(Response)(Data, Size);
-end;
-
-class function TFPHTTPClient.SimpleGet(Url, HeadersJson: String): String;
-var
-  P: Pointer;
-  Size: Cardinal;
-  I: Integer;
-begin
-  P := Get(PChar(Url), PChar(HeadersJson), @Size);
-  Result := '';
-  for I := 0 to Size - 1 do
-    Result := Result + Char((P + I)^);
-  FreeMem(P);
+    TAsyncResponse(Response)(Status, Data, Size);
 end;
 
 class procedure TFPHTTPClient.SimpleGetAsync(Url, HeadersJson: String; Response: TAsyncResponse);

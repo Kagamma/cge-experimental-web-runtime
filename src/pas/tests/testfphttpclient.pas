@@ -9,7 +9,7 @@ uses
 type
   TTestFPHTTPClient = class(TWindow)
   protected
-    procedure Response(Data: Pointer; Size: Cardinal);
+    procedure Response(Status: Cardinal; Data: Pointer; Size: Cardinal);
   public
     constructor Create;
   end;
@@ -20,20 +20,20 @@ constructor TTestFPHTTPClient.Create;
 begin
   inherited;
   Writeln('TODO: TFPHTTPClient');
-  Writeln('Get /index.html');
-  Writeln('Result from get: ');
-  Writeln('- ', TFPHTTPClient.SimpleGet('/index.html', '{}'));
   Writeln('Async Get /index.html');
   TFPHTTPClient.SimpleGetAsync('/index.html', '{}', @Self.Response);
+  Writeln('Async Get https://duckduckgo.com');
+  TFPHTTPClient.SimpleGetAsync('https://duckduckgo.com', '{}', @Self.Response);
 end;
 
-procedure TTestFPHTTPClient.Response(Data: Pointer; Size: Cardinal);
+procedure TTestFPHTTPClient.Response(Status: Cardinal; Data: Pointer; Size: Cardinal);
 var
   I: Integer;
   S: String = '';
 begin
   for I := 0 to Size - 1 do
     S := S + Char((Data + I)^);
+  Writeln('Status from async get: ', Status);
   Writeln('Result from async get: ');
   Writeln('- ', S);
   FreeMem(Data);
