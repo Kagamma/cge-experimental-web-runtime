@@ -14,18 +14,20 @@ export class Image extends Object {
    * @param {*} height pointer to height
    * @returns Pointer to bitmap
    */
-  load = (fileData, size, widthPtr, heightPtr) => {
+  load = (fileData, size, widthPtr, heightPtr, bppPtr) => {
     this.refreshMemory();
     const imgData = new Uint8Array(this.instance.memory.buffer, fileData, size);
 
     const { data, width, height } = decode(imgData);
-    const len = width * height * 4;
+    const bpp = data.byteLength / (width * height);
+    const len = width * height * bpp;
     const result = this.allocMem(len);
     this.refreshMemory();
     const dataMap = new Uint8Array(this.instance.memory.buffer, result, len);
     dataMap.set(data);
     this.view.setUint32(widthPtr, width, true);
     this.view.setUint32(heightPtr, height, true);
+    this.view.setUint32(bppPtr, bpp, true);
 
     return result;
   }

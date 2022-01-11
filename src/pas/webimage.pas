@@ -21,7 +21,7 @@ type
 
 implementation
 
-function ImageLoad(Data: Pointer; Size: Cardinal; Width, Height: PCardinal): Pointer; external 'image' name 'load';
+function ImageLoad(Data: Pointer; Size: Cardinal; Width, Height, Bpp: PCardinal): Pointer; external 'image' name 'load';
 
 constructor TWebImage.Create;
 begin
@@ -40,8 +40,7 @@ procedure TWebImage.LoadFromMemory(const Data: Pointer; const Size: Cardinal);
 begin
   if FData <> nil then
     FreeMem(FData);
-  FData := ImageLoad(Data, Size, @FWidth, @Height);
-  FBpp := 4;
+  FData := ImageLoad(Data, Size, @FWidth, @Height, @Bpp);
 end;
 
 end.
