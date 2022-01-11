@@ -464,7 +464,7 @@ export class WASI extends Object {
     if (fd !== this.availFD) return WASI_EINVAL;
     this.refreshMemory();
     const jspath = this.getJSString(pathStr, pathLen);
-    fs.mkdirSync(jspath);
+    fs.mkdirSync(jspath, { recursive: true });
     return WASI_ESUCCESS;
   }
 
