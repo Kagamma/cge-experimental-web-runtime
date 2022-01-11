@@ -34,6 +34,7 @@ begin
   for I := 0 to Size - 1 do
     S := S + Char((Data + I)^);
   Writeln('- ', S);
+  FreeMem(Data);
 
   // Async
   Writeln('Async Get /index.html');
