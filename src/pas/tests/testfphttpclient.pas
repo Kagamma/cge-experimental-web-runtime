@@ -17,9 +17,25 @@ type
 implementation
 
 constructor TTestFPHTTPClient.Create;
+var
+  Status, Size: Cardinal;
+  Data: Pointer;
+  I: Integer;
+  S: String = '';
 begin
   inherited;
   Writeln('TODO: TFPHTTPClient');
+
+  // Sync
+  Writeln('Get /index.html');
+  TFPHTTPClient.SimpleGet('/index.html', '{}', @Status, @Data, @Size);
+  Writeln('Status from get: ', Status);
+  Writeln('Result from get: ');
+  for I := 0 to Size - 1 do
+    S := S + Char((Data + I)^);
+  Writeln('- ', S);
+
+  // Async
   Writeln('Async Get /index.html');
   TFPHTTPClient.SimpleGetAsync('/index.html', '{}', @Self.Response);
   Writeln('Async Get https://duckduckgo.com');
