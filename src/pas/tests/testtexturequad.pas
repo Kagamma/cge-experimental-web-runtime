@@ -6,7 +6,7 @@ unit TestTextureQuad;
 interface
 
 uses
-  Window, WebOpenGLES;
+  Window, WebOpenGLES, WebImage, webfphttpclient;
 
 type
   TTestTextureQuad = class(TWindow)
@@ -17,6 +17,7 @@ type
     FVertexLoc, FTexCoordLoc: GLint;
     FAngleUniformLoc, FTextureUniformLoc: GLint;
     FAngle: Single;
+    procedure Response(Status: Cardinal; Data: Pointer; Size: Cardinal);
   public
     constructor Create;
     destructor Destroy; override;
@@ -25,8 +26,6 @@ type
   end;
 
 implementation
-
-{$I ./image.inc}
 
 var
   VertShaderSource: PChar =
@@ -65,18 +64,31 @@ var
     0, 1
   );
 
+procedure TTestTextureQuad.Response(Status: Cardinal; Data: Pointer; Size: Cardinal);
+var
+  Image: TWebImage;
+begin
+  if Status = 200 then
+  begin
+    Image := TWebImage.Create;
+    Image.LoadFromMemory(Data, Size);
+    glGenTextures(1, @FTexture);
+    glBindTexture(GL_TEXTURE_2D, FTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Image.Width, Image.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Image.Data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    Image.Free;
+  end;
+end;
+
 constructor TTestTextureQuad.Create;
 var
   Len: GLint;
 begin
   inherited;
-  glGenTextures(1, @FTexture);
-  glBindTexture(GL_TEXTURE_2D, FTexture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ImageWidth, ImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, @ImagePixels[0]);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  TFPHTTPClient.SimpleGetAsync('/icon.png', '{}', @Self.Response);
 
   glGenBuffers(1, @FVertexBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, FVertexBuffer);
@@ -118,7 +130,8 @@ begin
   glDeleteShader(FFragShader);
   glDeleteBuffers(1, @FVertexBuffer);
   glDeleteBuffers(1, @FTexCoordBuffer);
-  glDeleteTextures(1, @FTexture);
+  if FTexture <> 0 then
+    glDeleteTextures(1, @FTexture);
   inherited;
 end;
 

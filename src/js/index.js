@@ -1,6 +1,11 @@
 import { WASI } from './wasi';
 import { OpenGLES } from './opengles';
 import { FPHTTPClient } from './fphttpclient';
+import { Image } from './image';
+import { Buffer } from 'buffer';
+
+// Require for image-decode
+window.Buffer = window.Buffer || Buffer;
 
 function main() {
   const menu = document.createElement('div');
@@ -38,10 +43,12 @@ function main() {
   const wasi = new WASI();
   const opengles = new OpenGLES(gl);
   const fphttpclient = new FPHTTPClient();
+  const image = new Image();
   const importModule = {
     wasi_snapshot_preview1: wasi,
     opengles,
     fphttpclient,
+    image,
   };
 
   (async () => {
@@ -49,6 +56,7 @@ function main() {
     wasi.setModuleInstance(result.instance);
     opengles.setModuleInstance(result.instance);
     fphttpclient.setModuleInstance(result.instance);
+    image.setModuleInstance(result.instance);
     result.instance.exports._start();
 
     function button(name, func) {

@@ -31,6 +31,6 @@ export class FPHTTPClient extends Object{
     const result = this.allocMem(len);
     const dataMap = new Uint8Array(this.instance.memory.buffer, result, len);
     dataMap.set(data);
-    this.instance.ExecuteAsyncResponse(callback, response.status, result, len);
+    this.instance.ExecuteAsyncHttpResponse(callback, response.status, result, len);
   }
 };

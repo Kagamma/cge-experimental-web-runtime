@@ -20,6 +20,7 @@ module.exports = {
       'stream': require.resolve('stream-browserify'),
       'assert': require.resolve('assert/'),
       'util': require.resolve('util/'),
+      'zlib': require.resolve('browserify-zlib'),
     },
   },
   module: {
