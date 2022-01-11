@@ -21,7 +21,7 @@ var
   S: String;
   C: Char;
   DirectoryName: String = 'data';
-  FileName: String = 'data/test.txt';
+  FileName: String = 'data/test.dat';
 begin
   inherited;
   Writeln('TODO: Filesystem');
@@ -112,6 +112,15 @@ begin
     Writeln('- Found!')
   else
     Writeln('- Not found!');
+
+  FileName := 'data/fox.dat';
+  Writeln('Reading ', FileName,' which is located on the server...');
+  S := '';
+  F := FileOpen(FileName, fmOpenRead);
+  while FileRead(F, C, 1) <> 0 do
+    S := S + C;
+  Writeln('- Result: ', S);
+  FileClose(F);
 
   Writeln('Delete directory ', DirectoryName);
   RemoveDir(DirectoryName);
