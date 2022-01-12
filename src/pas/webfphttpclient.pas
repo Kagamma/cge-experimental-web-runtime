@@ -7,7 +7,9 @@ type
 
   TFPHTTPClient = class
   public
+    { Perform GET. The app will be blocked until this procedure either complete or error }
     class procedure SimpleGet(Url, HeadersJson: String; Status: PCardinal; Data: PPointer; Size: PCardinal);
+    { Perform async GET. Result will be passed to Response }
     class procedure SimpleGetAsync(Url, HeadersJson: String; Response: TAsyncHttpResponse);
   end;
 

@@ -12,6 +12,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    { Decode a file from memory. Data points to the file's in-memory data, size is file's size in bytes }
     procedure LoadFromMemory(const Data: Pointer; const Size: Cardinal);
     property Width: Cardinal read FWidth;
     property Height: Cardinal read FHeight;

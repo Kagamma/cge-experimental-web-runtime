@@ -6,6 +6,14 @@ export class FPHTTPClient extends Object{
     super();
   }
 
+  /**
+   * Sync get
+   * @param {*} url PChar, contain URL
+   * @param {*} headersJson PChar, contain JSON string describe HTTP headers
+   * @param {*} statusPtr PCardinal, return status
+   * @param {*} dataPtr Pointer, return response data
+   * @param {*} sizePtr PCardinal, return size of data
+   */
   get = async (url, headersJson, statusPtr, dataPtr, sizePtr) => {
     this.refreshMemory();
     const jsurl = this.getJSString(url);
@@ -40,6 +48,12 @@ export class FPHTTPClient extends Object{
     this.view.setUint32(sizePtr, len, true);
   }
 
+  /**
+   * Async get
+   * @param {*} url PChar, contain URL
+   * @param {*} headersJson PChar, contain JSON string describe HTTP headers
+   * @param {*} callback Uint64, pointer to a TAsyncHttpResponse
+   */
   getAsync = async (url, headersJson, callback) => {
     this.refreshMemory();
     const jsurl = this.getJSString(url);
