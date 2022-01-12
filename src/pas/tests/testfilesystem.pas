@@ -113,15 +113,6 @@ begin
   else
     Writeln('- Not found!');
 
-  FileName := 'data/fox.dat';
-  Writeln('Reading ', FileName,' which is located on the server...');
-  S := '';
-  F := FileOpen(FileName, fmOpenRead);
-  while FileRead(F, C, 1) <> 0 do
-    S := S + C;
-  Writeln('- Result: ', S);
-  FileClose(F);
-
   Writeln('Delete directory ', DirectoryName);
   RemoveDir(DirectoryName);
 end;

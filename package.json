@@ -13,14 +13,13 @@
   },
   "dependencies": {
     "assert": "2.0.0",
-    "browserify-zlib": "^0.2.0",
+    "browserify-zlib": "0.2.0",
     "buffer": "6.0.3",
     "image-decode": "1.2.2",
     "memfs": "3.4.1",
     "path-browserify": "1.0.1",
     "process": "0.11.10",
     "stream-browserify": "3.0.0",
-    "sync-fetch": "^0.3.1",
     "url": "0.11.0",
     "util": "0.12.4"
   }

@@ -1,8 +1,6 @@
 import { fs } from 'memfs';
 import path from 'path-browserify';
-import syncFetch from 'sync-fetch';
 import { Object } from './classes';
-import { pcharToJSString } from './utils';
 
 const WASI_ESUCCESS = 0;
 const WASI_E2BIG = 1;
@@ -211,35 +209,6 @@ export class WASI extends Object {
     try {
       if (fs.existsSync(jspath)) {
         return fs.lstatSync(jspath);
-      } else {
-        const { dir, ext } = path.parse(jspath);
-        if (ext === '') {
-          // Simple check to see if this is a file or directory, by checking its extension
-          return false;
-        }
-        // Try to request on server to see if we could find the file
-        let response;
-        try {
-          response = syncFetch(jspath, {
-            method: 'GET',
-            // headers, // TODO: we should allows users to set a default headers
-          });
-        } catch (e) {
-          response = { ok: false, statusText: e.message, status: 600 }
-        }
-        const isOk = response.ok && response.status < 400;
-        let data;
-        if (isOk) {
-          data = new Uint8Array(response.arrayBuffer());
-          // We now save data to memfs
-          // Create directory if not exists
-          if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-          }
-          // Create the file and save data
-          fs.appendFileSync(jspath, data);
-          return fs.lstatSync(jspath);
-        }
       }
     } catch(err) {
     }
