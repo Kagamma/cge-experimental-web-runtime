@@ -78,6 +78,7 @@ function main() {
     button('Texture quad', 'InitTestTextureQuad');
     button('Filesystem', 'InitTestFilesystem');
     button('FPHTTPClient', 'InitFPHTTPClient');
+    button('Generics.Collections', 'InitGenericsCollections');
   })();
 }
 

@@ -2,7 +2,7 @@ program App;
 
 uses
   SysUtils,
-  Window, TestTriangle, TestFilesystem, TestTextureQuad, TestFPHTTPClient;
+  Window, TestTriangle, TestFilesystem, TestTextureQuad, TestFPHTTPClient, TestGenericsCollections;
 
 var
   Ticks: QWord;
@@ -35,6 +35,13 @@ begin
   Win := TTestFPHTTPClient.Create;
 end;
 
+procedure InitGenericsCollections;
+begin
+  if Win <> nil then
+    FreeAndNil(Win);
+  Win := TTestGenericsCollections.Create;
+end;
+
 procedure Run;
 var
   DeltaTime: Single;
@@ -56,6 +63,7 @@ exports
   InitTestTextureQuad,
   InitTestFilesystem,
   InitFPHTTPClient,
+  InitGenericsCollections,
   AllocMem,
   Run;
 
