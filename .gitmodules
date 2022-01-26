@@ -1,4 +1,4 @@
-[submodule "src/pas/packages/castle-engine"]
-	path = src/pas/packages/castle-engine
-	url = https://github.com/Kagamma/castle-engine.git
+[submodule "castle-engine"]
+	path = castle-engine
+	url = https://github.com/Kagamma/castle-engine
 	branch = wasm32-wasi-port
