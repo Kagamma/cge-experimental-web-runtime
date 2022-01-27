@@ -88,7 +88,7 @@ var
   Len: GLint;
 begin
   inherited;
-  TFPHTTPClient.SimpleGetAsync('/icon.png', '{}', @Self.Response);
+  TFPHTTPClient.SimpleGetAsync('data/icon.png', '{}', @Self.Response);
 
   glGenBuffers(1, @FVertexBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, FVertexBuffer);

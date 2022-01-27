@@ -1,8 +1,8 @@
-import { WASI } from './wasi';
-import { OpenGLES } from './opengles';
-import { FPHTTPClient } from './fphttpclient';
-import { Image } from './image';
 import { Buffer } from 'buffer';
+import { WASI } from './web/wasi';
+import { OpenGLES } from './web/opengles';
+import { FPHTTPClient } from './web/fphttpclient';
+import { Image } from './web/image';
 
 // Require for image-decode
 window.Buffer = window.Buffer || Buffer;
