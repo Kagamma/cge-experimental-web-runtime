@@ -4,10 +4,10 @@ interface
 
 uses
   SysUtils, Generics.Collections, Generics.Defaults,
-  Window;
+  WebWindow;
 
 type
-  TTestGenericsCollections = class(TWindow)
+  TTestGenericsCollections = class(TWebWindow)
   public
     constructor Create;
     procedure Test1;

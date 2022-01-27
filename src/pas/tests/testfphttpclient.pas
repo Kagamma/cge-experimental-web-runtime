@@ -4,10 +4,10 @@ interface
 
 uses
   SysUtils,
-  Window, webfphttpclient;
+  WebWindow, webfphttpclient;
 
 type
-  TTestFPHTTPClient = class(TWindow)
+  TTestFPHTTPClient = class(TWebWindow)
   protected
     procedure Response(Status: Cardinal; Data: Pointer; Size: Cardinal);
   public

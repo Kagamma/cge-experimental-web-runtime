@@ -7,10 +7,10 @@ interface
 
 uses
   SysUtils, Classes,
-  Window, WebOpenGLES, WebImage;
+  WebWindow, WebOpenGLES, WebImage;
 
 type
-  TTestTextureQuad = class(TWindow)
+  TTestTextureQuad = class(TWebWindow)
   private
     FTexture: GLuint;
     FVertexBuffer, FTexCoordBuffer: GLuint;

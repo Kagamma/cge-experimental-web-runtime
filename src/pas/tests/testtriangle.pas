@@ -6,10 +6,10 @@ unit TestTriangle;
 interface
 
 uses
-  Window, WebOpenGLES;
+  WebWindow, WebOpenGLES;
 
 type
-  TTestTriangle = class(TWindow)
+  TTestTriangle = class(TWebWindow)
   private
     FVertexBuffer: GLuint;
     FVertShader, FFragShader, FProg: GLuint;
