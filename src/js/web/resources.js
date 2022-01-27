@@ -45,7 +45,7 @@ export async function prepareResources() {
     const xmlString = await response.text();
     // Write CastleDataInformation.xml to ramdisk
     fs.mkdirSync('data/auto_generated', { recursive: true });
-    fs.writeFileSync(data/auto_generated/CastleDataInformation.xml, xmlString);
+    fs.writeFileSync('data/auto_generated/CastleDataInformation.xml', xmlString);
     //
     const parser = new Parser();
     const json = await parser.parseStringPromise(xmlString);
