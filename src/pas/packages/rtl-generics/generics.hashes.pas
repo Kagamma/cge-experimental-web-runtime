@@ -76,6 +76,18 @@ uses
   {$endif}
 {$endif CPU64}
 
+// Original version of Bob Jenkins Hash
+// http://burtleburtle.net/bob/c/lookup3.c
+function HashWord(
+  AKey: PLongWord;                   //* the key, an array of uint32_t values */
+  ALength: SizeInt;                  //* the length of the key, in uint32_ts */
+  AInitVal: UInt32): UInt32;         //* the previous hash, or an arbitrary value */
+procedure HashWord2 (
+  AKey: PLongWord;                   //* the key, an array of uint32_t values */
+  ALength: SizeInt;                  //* the length of the key, in uint32_ts */
+  var APrimaryHashAndInitVal: UInt32;                  //* IN: seed OUT: primary hash value */
+  var ASecondaryHashAndInitVal: UInt32);               //* IN: more seed OUT: secondary hash value */
+
 function DelphiHashLittle(AKey: Pointer; ALength: SizeInt; AInitVal: UInt32): Int32;
 procedure DelphiHashLittle2(AKey: Pointer; ALength: SizeInt; var APrimaryHashAndInitVal, ASecondaryHashAndInitVal: UInt32);
 
@@ -165,6 +177,87 @@ end;
   b := b xor a; b -= (((a)shl(14)) or ((a)shr(32-(14))));
   c := c xor b; c -= (((b)shl(24)) or ((b)shr(32-(24))))
 }
+
+function HashWord(
+  AKey: PLongWord;                   //* the key, an array of uint32_t values */
+  ALength: SizeInt;               //* the length of the key, in uint32_ts */
+  AInitVal: UInt32): UInt32;         //* the previous hash, or an arbitrary value */
+var
+  a,b,c: UInt32;
+  Cases: Byte;
+begin
+  //* Set up the internal state */
+  a := $DEADBEEF + (UInt32(ALength) shl 2) + AInitVal;
+  b := a;
+  c := b;
+
+  //*------------------------------------------------- handle most of the key */
+  while ALength > 3 do
+  begin
+    a += AKey[0];
+    b += AKey[1];
+    c += AKey[2];
+    mix_abc;
+    ALength -= 3;
+    AKey += 3;
+  end;
+
+  //*------------------------------------------- handle the last 3 uint32_t's */
+  Cases := ALength;
+  if Cases >= 3 then
+    c+=AKey[2];
+  if Cases >= 2 then
+    b+=AKey[1];
+  if Cases >= 1 then
+  begin
+    a+=AKey[0];
+    final_abc;
+  end;
+  //*------------------------------------------------------ report the result */
+  Result := c;
+end;
+
+procedure HashWord2 (
+AKey: PLongWord;                   //* the key, an array of uint32_t values */
+ALength: SizeInt;               //* the length of the key, in uint32_ts */
+var APrimaryHashAndInitVal: UInt32;                      //* IN: seed OUT: primary hash value */
+var ASecondaryHashAndInitVal: UInt32);               //* IN: more seed OUT: secondary hash value */
+var
+  a,b,c: UInt32;
+  Cases: Byte;
+begin
+  //* Set up the internal state */
+  a := $deadbeef + (UInt32(ALength shl 2)) + APrimaryHashAndInitVal;
+  b := a;
+  c := b;
+  c += ASecondaryHashAndInitVal;
+
+  //*------------------------------------------------- handle most of the key */
+  while ALength > 3 do
+  begin
+    a += AKey[0];
+    b += AKey[1];
+    c += AKey[2];
+    mix_abc;
+    ALength -= 3;
+    AKey += 3;
+  end;
+
+  //*------------------------------------------- handle the last 3 uint32_t's */
+  Cases := ALength;
+  if Cases >= 3 then
+    c+=AKey[2];
+  if Cases >= 2 then
+    b+=AKey[1];
+  if Cases >= 1 then
+  begin
+    a+=AKey[0];
+    final_abc;
+  end;
+  //*------------------------------------------------------ report the result */
+  APrimaryHashAndInitVal := c;
+  ASecondaryHashAndInitVal := b;
+end;
 
 procedure DelphiHashLittle2(AKey: Pointer; ALength: SizeInt; var APrimaryHashAndInitVal, ASecondaryHashAndInitVal: UInt32);
 var
