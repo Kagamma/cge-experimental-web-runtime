@@ -4,10 +4,10 @@ interface
 
 uses
   SysUtils,
-  Window;
+  WebWindow;
 
 type
-  TTestFilesystem = class(TWindow)
+  TTestFilesystem = class(TWebWindow)
   public
     constructor Create;
   end;

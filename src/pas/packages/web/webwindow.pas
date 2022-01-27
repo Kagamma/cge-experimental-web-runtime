@@ -1,9 +1,9 @@
-unit Window;
+unit WebWindow;
 
 interface
 
 type
-  TWindow = class
+  TWebWindow = class
   protected
     FViewportWidth, FViewportHeight: Integer;
   public
@@ -16,33 +16,33 @@ type
   end;
 
 var
-  Win: TWindow = nil;
+  Win: TWebWindow = nil;
 
 implementation
 
-constructor TWindow.Create;
+constructor TWebWindow.Create;
 begin
   inherited;
   FViewportWidth := 640;
   FViewportHeight := 480;
 end;
 
-destructor TWindow.Destroy;
+destructor TWebWindow.Destroy;
 begin
   inherited;
 end;
 
-procedure TWindow.Update;
+procedure TWebWindow.Update;
 begin
   
 end;
 
-procedure TWindow.Render(const DeltaTime: Single);
+procedure TWebWindow.Render(const DeltaTime: Single);
 begin
   
 end;
 
-procedure TWindow.EventResize(const Width, Height: Integer);
+procedure TWebWindow.EventResize(const Width, Height: Integer);
 begin
   FViewportWidth := Width;
   FViewportHeight := Height;

@@ -2,7 +2,7 @@ program App;
 
 uses
   SysUtils,
-  Window, TestTriangle, TestFilesystem, TestTextureQuad, TestFPHTTPClient, TestGenericsCollections;
+  WebWindow, TestTriangle, TestFilesystem, TestTextureQuad, TestFPHTTPClient, TestGenericsCollections;
 
 var
   Ticks: QWord;
