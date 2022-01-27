@@ -70,7 +70,7 @@ export async function prepareResources() {
           fs.mkdirSync(files[j + i].path, { recursive: true });
           fs.writeFileSync(fullName, data);
         } else {
-          throw new Error('Data cannot be loaded! ', data.path)
+          throw new Error('Resource cannot be loaded! (', data.path, ')')
         }
       }
     }
