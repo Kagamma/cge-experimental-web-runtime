@@ -1,2 +1,2 @@
 #!/bin/bash
-fpc -Twasi -Pwasm32 -MObjFPC -Sh -Filib/wasm32-wasi -Fusrc/pas/* -Fusrc/pas/packages/* -Fusrc/pas/packages/rtl-objpas/* -Fusrc/pas/packages/fcl-base/* -Fucastle-engine/src/* -Ficastle-engine/src/* -Ficastle-engine/src/base/* -FUlib/wasm32-wasi -FE. -otestlinkererror.wasm src/pas/testlinkererror.pas
+fpc -Twasi -Pwasm32 -MObjFPC -Sh -Filib/wasm32-wasi -Fusrc/pas/* -Fusrc/pas/packages/* -Fusrc/pas/packages/rtl-objpas/* -Fusrc/pas/packages/fcl-base/* -Fucastle-engine/src/* -Fucastle-engine/src/x3d/* -Fucastle-engine/src/fonts/* -Fucastle-engine/src/images/* -Ficastle-engine/src/* -Ficastle-engine/src/base/* -Ficastle-engine/src/x3d/* -FUlib/wasm32-wasi -FE. -otestlinkererror.wasm src/pas/testlinkererror.pas

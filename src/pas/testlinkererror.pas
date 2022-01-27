@@ -2,7 +2,7 @@ program TestLinkerError;
 
 uses
   //contnrs, streamio, regexpr, dateutil, strutils, rttiutils;
-  CastleColors;
+  X3DLoad;
 
 begin
 
