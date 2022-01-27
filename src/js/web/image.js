@@ -18,7 +18,11 @@ export class Image extends Object {
     this.refreshMemory();
     const imgData = new Uint8Array(this.instance.memory.buffer, fileData, size);
 
-    const { data, width, height } = decode(imgData);
+    const image = decode(imgData);
+    if (!image.data) {
+      return 0; // Return nil if image cannot be decoded
+    }
+    const { data, width, height } = image;
     const bpp = data.byteLength / (width * height);
     const len = width * height * bpp;
     const result = this.allocMem(len);
