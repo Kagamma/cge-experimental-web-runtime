@@ -21,6 +21,7 @@ module.exports = {
       'assert': require.resolve('assert/'),
       'util': require.resolve('util/'),
       'zlib': require.resolve('browserify-zlib'),
+      'timers': require.resolve('timers-browserify'),
     },
   },
   module: {

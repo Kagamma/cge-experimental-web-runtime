@@ -20,8 +20,8 @@ var
   FF: File of Char;
   S: String;
   C: Char;
-  DirectoryName: String = 'data';
-  FileName: String = 'data/test.dat';
+  DirectoryName: String = 'test';
+  FileName: String = 'test/test.dat';
 begin
   inherited;
   Writeln('TODO: Filesystem');

@@ -2,6 +2,9 @@ unit webimage;
 
 interface
 
+uses
+  SysUtils, Classes;
+
 type
   TWebImage = class
   protected
@@ -12,6 +15,8 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    { Decode a file from TStream }
+    procedure LoadFromStream(const Stream: TStream);
     { Decode a file from memory. Data points to the file's in-memory data, size is file's size in bytes }
     procedure LoadFromMemory(const Data: Pointer; const Size: Cardinal);
     property Width: Cardinal read FWidth;
@@ -35,6 +40,19 @@ begin
   if FData <> nil then
     FreeMem(FData);
   inherited;
+end;
+
+procedure TWebImage.LoadFromStream(const Stream: TStream);
+var
+  MS: TMemoryStream;
+begin
+  MS := TMemoryStream.Create;
+  try
+    MS.CopyFrom(Stream, Stream.Size);
+    FData := ImageLoad(MS.Memory, MS.Size, @FWidth, @Height, @Bpp);
+  finally
+    FreeAndNil(MS);
+  end;
 end;
 
 procedure TWebImage.LoadFromMemory(const Data: Pointer; const Size: Cardinal);
