@@ -43,6 +43,10 @@ export async function prepareResources() {
   const isOk = response.ok && response.status < 400;
   if (isOk) {
     const xmlString = await response.text();
+    // Write CastleDataInformation.xml to ramdisk
+    fs.mkdirSync('data/auto_generated', { recursive: true });
+    fs.writeFileSync(data/auto_generated/CastleDataInformation.xml, xmlString);
+    //
     const parser = new Parser();
     const json = await parser.parseStringPromise(xmlString);
     // Search for list of files
@@ -70,9 +74,11 @@ export async function prepareResources() {
           fs.mkdirSync(files[j + i].path, { recursive: true });
           fs.writeFileSync(fullName, data);
         } else {
-          throw new Error('Resource cannot be loaded! (', data.path, ')')
+          throw new Error('Resource cannot be downloaded! (', data.path, ')')
         }
       }
     }
+  } else {
+    throw new Error('Cannot download metadata for resources!')
   }
 }
