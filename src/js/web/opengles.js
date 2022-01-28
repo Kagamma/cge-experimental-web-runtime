@@ -160,10 +160,10 @@ export class OpenGLES extends Object {
     this.gl.compileShader(this.objHeap[handle]);
   }
 
-  glCompressedTexImage2D = (target, level, internalformat, x, y, width, height, border, imageSize, data) => {
+  glCompressedTexImage2D = (target, level, internalformat, width, height, border, imageSize, data) => {
     this.refreshMemory();
     const buf = new Uint8Array(this.instance.memory.buffer, data, imageSize);
-    this.gl.compressedTexImage2D(target, level, internalformat, x, y, width, height, border, buf);
+    this.gl.compressedTexImage2D(target, level, internalformat, width, height, border, buf);
   }
 
   glCompressedTexSubImage2D = (target, level, xoffset, yoffset, width, height, format, imageSize, data) => {

@@ -798,7 +798,7 @@ procedure glBlendEquationSeparate(modeRGB, modeAlpha: GLenum); external 'opengle
 procedure glBlendFunc(sfactor, dfactor: GLenum); external 'opengles' name 'glBlendFunc';
 procedure glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha: GLenum); external 'opengles' name 'glBlendFuncSeparate';
 procedure glBufferData(target: GLenum; size: GLsizeiptr; const data: GLvoid; usage: GLenum); external 'opengles' name 'glBufferData';
-procedure glBufferSubData(target: GLenum; offset: GLintptr; size: GLsizeiptr; data: pointer; usage: GLenum); external 'opengles' name 'glBufferSubData';
+procedure glBufferSubData(target: GLenum; offset: GLintptr; size: GLsizeiptr; data: pointer); external 'opengles' name 'glBufferSubData';
 function glCheckFramebufferStatus(target: GLenum): GLenum; external 'opengles' name 'glCheckFramebufferStatus';
 procedure glClear(mask: GLbitfield); external 'opengles' name 'glClear';
 procedure glClearColor(red, green, blue, alpha: GLclampf); external 'opengles' name 'glClearColor';
@@ -806,7 +806,7 @@ procedure glClearDepth(depth: GLclampf); external 'opengles' name 'glClearDepth'
 procedure glClearStencil(s: GLint); external 'opengles' name 'glClearStencil';
 procedure glColorMask(red, green, blue, alpha: GLboolean); external 'opengles' name 'glColorMask';
 procedure glCompileShader(shader: GLuint); external 'opengles' name 'glCompileShader';
-procedure glCompressedTexImage2D(target: GLenum; level: GLint; internalformat: GLenum; x: GLint; y: GLint;
+procedure glCompressedTexImage2D(target: GLenum; level: GLint; internalformat: GLenum;
     width: GLsizei; height: GLsizei; border: GLint; imageSize: GLsizei; data: pointer); external 'opengles' name 'glCompressedTexImage2D';
 procedure glCompressedTexSubImage2D(target: GLenum; level: GLint; xoffset: GLint; yoffset: GLint; width: GLsizei;
     height: GLsizei; format: GLenum; imageSize: GLsizei; data: pointer); external 'opengles' name 'glCompressedTexSubImage2D';
@@ -896,7 +896,7 @@ procedure glStencilFuncSeparate(face: GLenum; func: GLenum; ref: GLint; mask: GL
 procedure glStencilMask(mask: GLuint); external 'opengles' name 'glStencilMask';
 procedure glStencilMaskSeparate(face: GLenum; mask: GLuint); external 'opengles' name 'glStencilMaskSeparate';
 procedure glStencilOp(fail: GLenum; zfail: GLenum; zpass: GLenum); external 'opengles' name 'glStencilOp';
-procedure glStencilOpSeparate(face: GLenum; fail: GLenum; zfail: GLenum; zpass: GLenum); external 'opengles' name 'glStencilOp';
+procedure glStencilOpSeparate(face: GLenum; fail: GLenum; zfail: GLenum; zpass: GLenum); external 'opengles' name 'glStencilOpSeparate';
 procedure glTexImage2D(target: GLenum; level: GLint; internalformat: GLenum; width: GLsizei; height: GLsizei;
     border: GLint; format: GLenum; _type: GLenum; pixels: pointer); external 'opengles' name 'glTexImage2D';
 procedure glTexSubImage2D(target: GLenum; level: GLint; xoffset: GLint; yoffset: GLint; width: GLsizei;
@@ -916,9 +916,9 @@ procedure glUniform2fv(location: GLint; count: GLsizei; v: pGLfloat); external '
 procedure glUniform3fv(location: GLint; count: GLsizei; v: pGLfloat); external 'opengles' name 'glUniform3fv';
 procedure glUniform4fv(location: GLint; count: GLsizei; v: pGLfloat); external 'opengles' name 'glUniform4fv';
 procedure glUniform1iv(location: GLint; count: GLsizei; v: pGLint); external 'opengles' name 'glUniform1iv';
-procedure glUniform12v(location: GLint; count: GLsizei; v: pGLint); external 'opengles' name 'glUniform2iv';
-procedure glUniform13v(location: GLint; count: GLsizei; v: pGLint); external 'opengles' name 'glUniform3iv';
-procedure glUniform14v(location: GLint; count: GLsizei; v: pGLint); external 'opengles' name 'glUniform4iv';
+procedure glUniform2iv(location: GLint; count: GLsizei; v: pGLint); external 'opengles' name 'glUniform2iv';
+procedure glUniform3iv(location: GLint; count: GLsizei; v: pGLint); external 'opengles' name 'glUniform3iv';
+procedure glUniform4iv(location: GLint; count: GLsizei; v: pGLint); external 'opengles' name 'glUniform4iv';
 procedure glUniformMatrix2fv(location: GLint; count: GLsizei; transpose: GLboolean; value: pGLfloat); external 'opengles' name 'glUniformMatrix2fv';
 procedure glUniformMatrix3fv(location: GLint; count: GLsizei; transpose: GLboolean; value: pGLfloat); external 'opengles' name 'glUniformMatrix3fv';
 procedure glUniformMatrix4fv(location: GLint; count: GLsizei; transpose: GLboolean; value: pGLfloat); external 'opengles' name 'glUniformMatrix4fv';
