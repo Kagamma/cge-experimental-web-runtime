@@ -81,8 +81,6 @@ Type
     function StreamTStringsObject(Const AStrings: TStrings): TJSONObject;
     // Stream a TStrings instance. Takes into account Options.
     function StreamTStrings(Const AStrings: TStrings): TJSONData;
-    // Stream a variant as JSON.
-    function StreamVariant(const Data: Variant): TJSONData; virtual;
     //
     // Some utility functions.
     //
@@ -92,8 +90,6 @@ Type
     Function StringsToJSON(Const Strings : TStrings; AsObject : Boolean = False) : TJSONStringType;
     // Convert collection to JSON string
     Function CollectionToJSON(Const ACollection : TCollection) : TJSONStringType;
-    // Convert variant to JSON String
-    Function VariantToJSON(Const Data : Variant) : TJSONStringType;
   Published
     // Format used when formatting DateTime values. Only used in conjunction with jsoDateTimeToString
     Property DateTimeFormat : String Read FDateTimeFormat Write FDateTimeFormat;
@@ -151,9 +147,6 @@ Type
     // Convert JSON array/object/string to TStrings
     Procedure JSONToStrings(Const JSON : TJSONStringType; AStrings : TSTrings);
     Procedure JSONToStrings(Const JSON : TJSONData; AStrings : TSTrings);
-    // Convert JSON data to a variant. Supports simple data types and arrays.
-    Function JSONToVariant(Data: TJSONData): Variant;
-    Function JSONToVariant(Data: TJSONStringType): Variant;
     // Triggered at the start of each call to JSONToObject
     Property BeforeReadObject : TJSONStreamEvent Read FBeforeReadObject Write FBeforeReadObject;
     // Triggered at the end of each call to JSONToObject (not if exception happens)
@@ -179,12 +172,11 @@ Type
 
 implementation
 
-uses dateutils, variants, rtlconsts;
+uses dateutils, rtlconsts;
 
 ResourceString
   SErrUnknownPropertyKind     = 'Unknown property kind for property : "%s"';
   SErrUnsupportedPropertyKind = 'Unsupported property kind for property: "%s"';
-  SErrUnsupportedVariantType  = 'Unsupported variant type : %d';
   SErrUnsupportedArrayType    = 'JSON array cannot be streamed to object of class "%s"';
   SErrUnsupportedJSONType     = 'Cannot destream object from JSON data of type "%s"';
   SErrUnsupportedCollectionType = 'Unsupported JSON type for collections: "%s"';
@@ -193,7 +185,6 @@ ResourceString
   SErrUnsupportedStringsType = 'Unsupported JSON type for stringlists: "%s"';
   SErrUnsupportedStringsObjectType = 'Object Element %s is not a valid type for a stringlist object: "%s"';
   SErrUnSupportedEnumDataType = 'Unsupported JSON type for enumerated property "%s" : "%s"';
-  SErrUnsupportedVariantJSONType = 'Unsupported JSON type for variant value : "%s"';
   SErrUnsupportedObjectData = 'Unsupported JSON type for object property: "%s"';
 
 { TStreamChildrenHelper }
@@ -265,51 +256,6 @@ begin
       Error(SErrUnsupportedJSONType,[JSONTypeName(D.JSONType)]);
   finally
     FreeAndNil(D);
-  end;
-end;
-
-function TJSONDeStreamer.JSONToVariant(Data: TJSONData): Variant;
-
-Var
-  I : integer;
-
-begin
-  Case Data.JSONType of
-    jtNumber :
-      Case TJSONNumber(Data).NumberType of
-        ntFloat   : Result:=Data.AsFloat;
-        ntInteger : Result:=Data.AsInteger;
-        ntInt64   : Result:=Data.Asint64;
-        ntQWord   : Result:=Data.AsQWord;
-      end;
-    jtString :
-      Result:=Data.AsString;
-    jtBoolean:
-      Result:=Data.AsBoolean;
-    jtNull:
-      Result:=Null;
-    jtArray :
-      begin
-      Result:=VarArrayCreate([0,Data.Count-1],varVariant);
-      For I:=0 to Data.Count-1 do
-        Result[i]:=JSONToVariant(Data.Items[i]);
-      end;
-  else
-    Error(SErrUnsupportedVariantJSONType,[GetEnumName(TypeInfo(TJSONType),Ord(Data.JSONType))]);
-  end;
-end;
-
-function TJSONDeStreamer.JSONToVariant(Data: TJSONStringType): Variant;
-
-Var
-  D : TJSONData;
-
-begin
-  D:=ObjectFromString(Data);
-  try
-    Result:=JSONToVariant(D);
-  finally
-    D.Free;
   end;
 end;
 
@@ -448,8 +394,6 @@ begin
       SetStrProp(AObject,PI,'');
     tkWString :
       SetWideStrProp(AObject,PI,'');
-    tkVariant:
-      SetVariantProp(AObject,PI,Null);
     tkClass:
       SetOrdProp(AObject,PI,0);
     tkUString :
@@ -533,8 +477,6 @@ begin
       SetStrProp(AObject,PI,PropData.AsString);
     tkWString :
       SetWideStrProp(AObject,PI,PropData.AsUnicodeString);
-    tkVariant:
-      SetVariantProp(AObject,PI,JSONToVariant(PropData));
     tkClass:
       DeStreamClassProperty(AObject,PI,PropData);
     tkWChar :
@@ -866,59 +808,6 @@ begin
   Result:=StreamProperty(AObject,GetPropInfo(AObject,PropertyName));
 end;
 
-Function TJSONStreamer.StreamVariant(Const Data : Variant): TJSONData;
-
-Var
-  A : TJSONArray;
-  I : Integer;
-
-begin
-  Result:=Nil;
-  If VarIsArray(Data) then
-    begin
-    A:=TJSONArray.Create;
-    try
-      For I:=VarArrayLowBound(Data,1) to VarArrayHighBound(Data,1) do
-        A.Add(StreamVariant(Data[i]));
-    except
-      FreeAndNil(A);
-      Raise;
-    end;
-    Exit(A);
-    end;
-  If VarIsEmpty(Data) or VarisNull(Data) or (Data=UnAssigned) then
-    Exit(TJSONNull.Create);
-  Case VarType(Data) of
-    varshortint,
-    varbyte,
-    varword,
-    varsmallint,
-    varinteger :
-      Result:=TJSONIntegerNumber.Create(Data);
-    varlongword,
-    varint64 :
-      Result:=TJSONInt64Number.Create(Data);
-    vardecimal,
-    varqword,
-    varsingle,
-    vardouble,
-    varCurrency :
-      Result:=TJSONFloatNumber.Create(Data);
-    varString,
-    varolestr :
-      Result:=TJSONString.Create(Data);
-    varboolean :
-      Result:=TJSONBoolean.Create(Data);
-    varDate :
-      if jsoDateTimeAsString in Options then
-        Result:=FormatDateProp(Data)
-      else
-        Result:=TJSONFloatNumber.Create(Data);
-  else
-    Error(SErrUnsupportedVariantType,[VarType(Data)])
-  end;
-end;
-
 function TJSONStreamer.ObjectToJSONString(AObject: TObject): TJSONStringType;
 
 Var
@@ -969,23 +858,6 @@ begin
       Result:=D.FormatJSON()
     else
     Result:=D.AsJSON;
-  finally
-    FreeAndNil(D);
-  end;
-end;
-
-function TJSONStreamer.VariantToJSON(const Data: Variant): TJSONStringType;
-
-Var
-  D : TJSONData;
-
-begin
-  D:=StreamVariant(Data);
-  try
-    if (jsoUseFormatString in Options) then
-      Result:=D.FormatJSON()
-    else
-      Result:=D.AsJSON;
   finally
     FreeAndNil(D);
   end;
@@ -1169,8 +1041,6 @@ begin
       Result:=TJSONString.Create(GetStrProp(AObject,PI));
     tkWString :
       Result:=TJSONString.Create(GetWideStrProp(AObject,PI));
-    tkVariant:
-      Result:=StreamVariant(GetVariantProp(AObject,PI));
     tkClass:
       Result:=StreamClassProperty(GetObjectProp(AObject,PI));
     tkWChar :
