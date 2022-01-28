@@ -99,7 +99,7 @@ begin
   end else
     MS := TMemoryStream.Create;
   try
-    if not IsMSOwned then
+    if IsMSOwned then
       MS.CopyFrom(Stream, Stream.Size);
     FData := ImageLoad(MS.Memory, MS.Size, @FWidth, @Height, @Bpp);
     if FData = nil then
