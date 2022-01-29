@@ -1,6 +1,30 @@
 import { fs } from 'memfs';
 import { Parser } from 'xml2js';
 
+let loadingDiv = null;
+let loadingText = null;
+
+//
+function showLoading() {
+  loadingDiv = document.createElement('div');
+  loadingDiv.style.position = 'absolute';
+  loadingDiv.style.width = '100%';
+  loadingDiv.style.height = '100%';
+  loadingDiv.style.zIndex = '1000';
+  loadingDiv.style.background = '#000';
+  loadingDiv.style.opacity = '0.9';
+  loadingText = document.createElement('div');
+  loadingText.style.textAlign = 'center';
+  loadingText.style.verticalAlign = 'middle';
+  loadingText.style.lineHeight = '50vh';
+  loadingDiv.appendChild(loadingText);
+  document.body.appendChild(loadingDiv);
+}
+
+function hideLoading() {
+  document.body.removeChild(loadingDiv);
+}
+
 /**
  * Look for list of files from JSON version of CastleDataInformation.xml
  * @param {*} data json.directory_information.directory[0]
@@ -54,7 +78,9 @@ export async function prepareResources() {
     searchForFiles(json.directory_information.directory[0], files, 'data/');
     if (files.length === 0) return;
     // Download data and store in ramdisk, 4 files each
+    showLoading();
     for (let i = 0; i < files.length; i += 4) {
+      loadingText.innerHTML = '<h1 style="color:#fff">LOADING ' + i + '/' + files.length + '</h1>';
       const downloadList = [];
       for (let j = i; j < i + 4; j++) {
         if (j >= files.length) break;
@@ -66,7 +92,6 @@ export async function prepareResources() {
         const fullName = files[j + i].path + files[j + i].name;
         const fileRes = responses[j];
         const fileIsOk = fileRes.ok && fileRes.status < 400;
-        // TODO: Fancy download progress bar in the future?
         console.log((j + i + 1) + '/' + files.length + ' resource downloaded (' + fullName + ')');
         if (fileIsOk) {
           // Store the file in ramdisk
@@ -78,6 +103,7 @@ export async function prepareResources() {
         }
       }
     }
+    hideLoading();
   } else {
     throw new Error('Cannot download metadata for resources!')
   }

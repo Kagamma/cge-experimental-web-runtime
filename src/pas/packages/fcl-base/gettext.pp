@@ -399,5 +399,7 @@ begin
 end;
 
 finalization
+  {$ifndef FPC_WASI}
   finalizeresourcetables;
+  {$endif}
 end.

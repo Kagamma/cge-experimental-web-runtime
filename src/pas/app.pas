@@ -9,6 +9,7 @@ var
 
 procedure InitTestTriangle;
 begin
+  Ticks := GetTickCount64;
   if Win <> nil then
     FreeAndNil(Win);
   Win := TTestTriangle.Create;
@@ -16,6 +17,7 @@ end;
 
 procedure InitTestTextureQuad;
 begin
+  Ticks := GetTickCount64;
   if Win <> nil then
     FreeAndNil(Win);
   Win := TTestTextureQuad.Create;
@@ -23,6 +25,7 @@ end;
 
 procedure InitTestFilesystem;
 begin
+  Ticks := GetTickCount64;
   if Win <> nil then
     FreeAndNil(Win);
   Win := TTestFilesystem.Create;
@@ -37,6 +40,7 @@ end;
 
 procedure InitGenericsCollections;
 begin
+  Ticks := GetTickCount64;
   if Win <> nil then
     FreeAndNil(Win);
   Win := TTestGenericsCollections.Create;
@@ -69,4 +73,7 @@ exports
 
 begin
   Ticks := GetTickCount64;
+  if Win <> nil then
+    FreeAndNil(Win);
+  Win := TTestTriangle.Create;
 end.
