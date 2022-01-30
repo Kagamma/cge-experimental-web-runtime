@@ -3,6 +3,7 @@ import { WASI } from './web/wasi';
 import { OpenGLES } from './web/opengles';
 import { FPHTTPClient } from './web/fphttpclient';
 import { Image } from './web/image';
+import { Window } from './web/window';
 import { prepareResources } from './web/resources';
 
 // Require for image-decode
@@ -51,11 +52,13 @@ function main() {
     const opengles = new OpenGLES(gl);
     const fphttpclient = new FPHTTPClient();
     const image = new Image();
+    const window = new Window();
     const importModule = {
       wasi_snapshot_preview1: wasi,
       opengles,
       fphttpclient,
       image,
+      window,
     };
 
     const result = await WebAssembly.instantiateStreaming(fetch('app.wasm'), importModule);
@@ -63,6 +66,7 @@ function main() {
     opengles.setModuleInstance(result.instance);
     fphttpclient.setModuleInstance(result.instance);
     image.setModuleInstance(result.instance);
+    window.setModuleInstance(result.instance);
 
     function run(func) {
       result.instance.exports[func]();

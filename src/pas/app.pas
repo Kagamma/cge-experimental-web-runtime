@@ -72,6 +72,7 @@ exports
   Run;
 
 begin
+  SetCaption('CGE experimental web runtime');
   Ticks := GetTickCount64;
   if Win <> nil then
     FreeAndNil(Win);

@@ -21,6 +21,8 @@ type
     procedure EventMouseWheel(const Y: Integer); virtual;
   end;
 
+procedure SetCaption(S: PChar); external 'window' name 'setCaption';
+
 var
   Win: TWebWindow = nil;
 
