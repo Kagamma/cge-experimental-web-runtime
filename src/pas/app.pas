@@ -57,18 +57,12 @@ begin
   Win.Render(DeltaTime);
 end;
 
-function AllocMem(Size: LongWord): Pointer;
-begin
-  GetMem(Result, Size);
-end;
-
 exports
   InitTestTriangle,
   InitTestTextureQuad,
   InitTestFilesystem,
   InitFPHTTPClient,
   InitGenericsCollections,
-  AllocMem,
   Run;
 
 begin
