@@ -1,74 +1,24 @@
 program App;
 
+{$mode objfpc}{$H+}
+
 uses
-  SysUtils,
-  WebWindow, TestTriangle, TestFilesystem, TestTextureQuad, TestFPHTTPClient, TestGenericsCollections;
+  CastleWindow, CastleLog, CastleUIState,
+  GameStateMain;
 
 var
-  Ticks: QWord;
+  Window: TCastleWindow;
 
-procedure InitTestTriangle;
+procedure ApplicationInitialize;
 begin
-  Ticks := GetTickCount64;
-  if Win <> nil then
-    FreeAndNil(Win);
-  Win := TTestTriangle.Create;
+  Window.Container.LoadSettings('castle-data:/CastleSettings.xml');
+  StateMain := TStateMain.Create(Application);
+  TUIState.Current := StateMain;
 end;
 
-procedure InitTestTextureQuad;
 begin
-  Ticks := GetTickCount64;
-  if Win <> nil then
-    FreeAndNil(Win);
-  Win := TTestTextureQuad.Create;
-end;
-
-procedure InitTestFilesystem;
-begin
-  Ticks := GetTickCount64;
-  if Win <> nil then
-    FreeAndNil(Win);
-  Win := TTestFilesystem.Create;
-end;
-
-procedure InitFPHTTPClient;
-begin
-  if Win <> nil then
-    FreeAndNil(Win);
-  Win := TTestFPHTTPClient.Create;
-end;
-
-procedure InitGenericsCollections;
-begin
-  Ticks := GetTickCount64;
-  if Win <> nil then
-    FreeAndNil(Win);
-  Win := TTestGenericsCollections.Create;
-end;
-
-procedure Run;
-var
-  DeltaTime: Single;
-begin
-  DeltaTime := (GetTickCount64 - Ticks) / 1000;
-  Ticks := GetTickCount64;
-
-  Win.Update;
-  Win.Render(DeltaTime);
-end;
-
-exports
-  InitTestTriangle,
-  InitTestTextureQuad,
-  InitTestFilesystem,
-  InitFPHTTPClient,
-  InitGenericsCollections,
-  Run;
-
-begin
-  SetCaption('CGE experimental web runtime');
-  Ticks := GetTickCount64;
-  if Win <> nil then
-    FreeAndNil(Win);
-  Win := TTestTriangle.Create;
+  Application.OnInitialize := @ApplicationInitialize;
+  Window := TCastleWindow.Create(Application);
+  Application.MainWindow := Window;
+  Application.MainWindow.Open;
 end.

@@ -10,5 +10,8 @@ and we can search data files regardless if the OS API allows it.
   <directory>
     <directory name="auto_generated"/>
     <file name="icon.png" size="1543"/>
+    <file name="gamestatemain.castle-user-interface" size="1543"/>
+    <file name="cube.x3dv" size="1543"/>
+    <file name="CastleSettings.xml" size="1543"/>
   </directory>
 </directory_information>

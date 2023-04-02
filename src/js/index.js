@@ -111,7 +111,7 @@ function main() {
         result.instance.exports.EventMouseWheel(e.deltaY > 0 ? 1 : -1);
       };
       const loop = () => {
-        result.instance.exports.Run();
+        result.instance.exports.EventRun();
         requestAnimFrame(loop);
       };
       requestAnimFrame(loop);
@@ -124,11 +124,11 @@ function main() {
       btn.onclick = () => run(func);
       menu.appendChild(btn);
     }
-    button('Rotate triangle', 'InitTestTriangle');
-    button('Texture quad', 'InitTestTextureQuad');
-    button('Filesystem', 'InitTestFilesystem');
-    button('FPHTTPClient', 'InitFPHTTPClient');
-    button('Generics.Collections', 'InitGenericsCollections');
+    //button('Rotate triangle', 'InitTestTriangle');
+    //button('Texture quad', 'InitTestTextureQuad');
+    //button('Filesystem', 'InitTestFilesystem');
+    //button('FPHTTPClient', 'InitFPHTTPClient');
+    //button('Generics.Collections', 'InitGenericsCollections');
     run('_start');
   })();
 }
