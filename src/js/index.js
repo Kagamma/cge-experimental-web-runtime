@@ -13,10 +13,14 @@ const requestAnimFrame = (function(){
   return  window.requestAnimationFrame       ||
           window.webkitRequestAnimationFrame ||
           window.mozRequestAnimationFrame    ||
-          function( callback ){
+          function (callback) {
             window.setTimeout(callback, 1000 / 60);
           };
 })();
+
+const addEventListener = (name, callback) => {
+  window.addEventListener(name, callback);
+};
 
 function main() {
   (async () => {
@@ -81,7 +85,7 @@ function main() {
       result.instance.exports[func]();
       result.instance.exports.EventResize(canvas.offsetWidth, canvas.offsetHeight);
       // Add resize handler
-      document.body.addEventListener('resize', () => {
+      addEventListener('resize', () => {
         canvas.width = main.offsetWidth;
         canvas.height = main.offsetHeight;
         result.instance.exports.EventResize(canvas.offsetWidth, canvas.offsetHeight);
