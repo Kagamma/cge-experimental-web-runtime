@@ -9,6 +9,15 @@ import { prepareResources } from './web/resources';
 // Require for image-decode
 window.Buffer = window.Buffer || Buffer;
 
+const requestAnimFrame = (function(){
+  return  window.requestAnimationFrame       ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame    ||
+          function( callback ){
+            window.setTimeout(callback, 1000 / 60);
+          };
+})();
+
 function main() {
   (async () => {
     await prepareResources();
@@ -72,7 +81,7 @@ function main() {
       result.instance.exports[func]();
       result.instance.exports.EventResize(canvas.offsetWidth, canvas.offsetHeight);
       // Add resize handler
-      window.addEventListener('resize', () => {
+      document.body.addEventListener('resize', () => {
         canvas.width = main.offsetWidth;
         canvas.height = main.offsetHeight;
         result.instance.exports.EventResize(canvas.offsetWidth, canvas.offsetHeight);
@@ -99,9 +108,9 @@ function main() {
       };
       const loop = () => {
         result.instance.exports.Run();
-        window.requestAnimationFrame(loop);
+        requestAnimFrame(loop);
       };
-      window.requestAnimationFrame(loop);
+      requestAnimFrame(loop);
     }
 
     function button(name, func) {
