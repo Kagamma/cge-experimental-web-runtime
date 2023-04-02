@@ -122,6 +122,11 @@ begin
     Win.EventMouseWheel(Y);
 end;
 
+function AllocMem(Size: LongWord): Pointer;
+begin
+  GetMem(Result, Size);
+end;
+
 exports
   EventResize,
   EventKeyDown,
@@ -129,6 +134,7 @@ exports
   EventMouseMove,
   EventMouseDown,
   EventMouseUp,
-  EventMouseWheel;
+  EventMouseWheel,
+  AllocMem;
 
 end.
