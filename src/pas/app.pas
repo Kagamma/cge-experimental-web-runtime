@@ -1,4 +1,4 @@
-program App;
+library App;
 
 {$mode objfpc}{$H+}
 
@@ -16,9 +16,15 @@ begin
   TUIState.Current := StateMain;
 end;
 
+procedure CGEApp;
 begin
   Application.OnInitialize := @ApplicationInitialize;
   Window := TCastleWindow.Create(Application);
   Application.MainWindow := Window;
   Application.MainWindow.Open;
+end;
+
+exports
+  CGEApp;
+
 end.

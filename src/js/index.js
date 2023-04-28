@@ -82,7 +82,8 @@ function main() {
     window.setModuleInstance(result.instance);
 
     function run(func) {
-      result.instance.exports[func]();
+      result.instance.exports._initialize();
+      result.instance.exports.CGEApp();
       result.instance.exports.EventResize(canvas.offsetWidth, canvas.offsetHeight);
       // Add resize handler
       addEventListener('resize', () => {
